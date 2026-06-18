@@ -1,7 +1,7 @@
 {
   "name": "HMG ACADEMY CLASS DECK — Split-Screen Teaching Studio",
   "short_name": "HMG ClassDeck",
-  "description": "Lightweight installable teaching platform: split-screen whiteboard + PDF/browser workspace with built-in live classroom, screen share, captions and social-live OBS workflow.",
+  "description": "Lightweight installable teaching platform: split-screen whiteboard + PDF/browser workspace with built-in live classroom, direct ClassDeck screen sharing, captions and no-OBS tablet social live relay workflow.",
   "id": "/",
   "start_url": "./index.html",
   "scope": "./",
@@ -20,7 +20,7 @@
     { "name": "Teach on Google Meet", "url": "./teach.html?meet=1", "description": "Meet Companion: workspace for screen sharing on Meet" },
     { "name": "Start a class",   "url": "./teach.html",            "description": "Open the teacher studio (built-in live class)" },
     { "name": "Join a class",    "url": "./join.html",             "description": "Join as a student" },
-    { "name": "Social Live Centre", "url": "./stream.html",        "description": "OBS and RTMP workflow for social streaming" },
+    { "name": "Social Live Centre", "url": "./stream.html",        "description": "No-OBS tablet social live relay workflow" },
     { "name": "Solo workspace",  "url": "./teach.html?solo=1",     "description": "Whiteboard + PDF without a live class" }
   ]
 }

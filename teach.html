@@ -38,6 +38,7 @@
     <button class="btn small" id="btnCam" title="Toggle your camera">📷 Cam</button>
     <button class="btn small" id="btnMic" title="Toggle your microphone">🎙 Mic</button>
     <button class="btn small" id="btnRec" title="Record the lesson locally">⏺ Rec</button>
+    <button class="btn small" id="btnPiP" title="Picture-in-picture: keep a small live preview when you minimise/switch apps">▣ PiP</button>
 
     <button class="btn small" id="btnStudents" title="Students / monitoring">👥</button>
     <button class="btn small" id="btnChat" title="Class chat">💬</button>
@@ -517,6 +518,7 @@
       <button class="btn small" id="btnNoiseMeter" title="Live class-volume gauge using the teacher device microphone">🔊 Noise meter</button>
       <button class="btn small" id="btnGroups" title="Random group maker — students are told their group number">👥 Groups</button>
       <button class="btn small" id="btnBehaviorCSV" title="Behaviour points export">⭐ Points CSV</button>
+      <button class="btn small" id="btnAuditCSV" title="Security/audit log export">🛡 Audit CSV</button>
     </div>
     <hr class="sep" />
     <div id="waitingList"></div>
@@ -707,16 +709,25 @@ Not sure</textarea>
       <label style="display:flex;align-items:center;gap:8px;margin:0"><input type="checkbox" id="setWake" checked /> Keep screen awake during class</label>
     </div>
     <hr class="sep" />
-    <label>📡 Social Live / OBS broadcast centre (free workflow)</label>
-    <p style="font-size:12px;color:var(--text-dim);margin:4px 0 8px">ClassDeck runs fully in the browser, so RTMP pushing to YouTube/Facebook/Instagram/TikTok is handled with free OBS Studio or a free relay. The centre gives you a clean output link, RTMP checklist and exportable setup notes.</p>
+    <label>📡 Tablet Social Live — no OBS</label>
+    <p style="font-size:12px;color:var(--text-dim);margin:4px 0 8px">Broadcast the ClassDeck lesson from this tablet to YouTube/Facebook/Instagram/TikTok through a free WebRTC→RTMP relay gateway. No OBS is required. If a browser cannot capture the whole Android system screen, ClassDeck still streams its own full teaching workspace directly.</p>
     <div class="row">
-      <button class="btn small" id="btnOpenStreamCentre">📡 Open centre</button>
-      <button class="btn small" id="btnOpenCleanOutput">🪟 Open clean output</button>
-      <button class="btn small ghost" id="btnObsSetup">⬇ OBS setup notes</button>
+      <button class="btn small primary" id="btnTabletLive">📡 Tablet Live</button>
+      <button class="btn small" id="btnTryScreenShare">🖥 Try full tablet screen</button>
+      <button class="btn small" id="btnOpenStreamCentre">🌐 Social centre</button>
+      <button class="btn small ghost" id="btnObsSetup">⬇ Setup notes</button>
     </div>
     <div class="row">
       <label style="display:flex;align-items:center;gap:8px;margin:0"><input type="checkbox" id="setNewRoom" /> Generate a new room code next time</label>
     </div>
+    <hr class="sep" />
+    <label>🔐 Security & anti-piracy controls</label>
+    <div class="row" style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap">
+      <label style="display:flex;align-items:center;gap:8px;margin:0"><input type="checkbox" id="setSecureInvite" /> Require secure invite link token</label>
+      <label style="display:flex;align-items:center;gap:8px;margin:0"><input type="checkbox" id="setWatermark" checked /> Add forensic watermark to broadcast/recording</label>
+      <label style="display:flex;align-items:center;gap:8px;margin:0"><input type="checkbox" id="setAutoPiP" /> Remind me to start PiP before live/background</label>
+    </div>
+    <p style="font-size:11.5px;color:var(--text-dim);margin:5px 0 0">For strongest subscription protection, deploy the included Cloudflare Worker license gateway and set its URL in <code>js/security-config.js</code>.</p>
     <hr class="sep" />
     <label>🔑 Class PIN (optional — students must enter it to join; leave empty for none)</label>
     <input class="input" id="setPin" placeholder="e.g. 2468" maxlength="8" inputmode="numeric" />
@@ -883,6 +894,62 @@ Not sure</textarea>
   </div>
 </div>
 
+<div class="modal-back" id="mTabletLive">
+  <div class="modal" style="max-width:760px">
+    <h3>📡 Tablet Social Live — direct, no OBS</h3>
+    <p style="color:var(--text-dim);font-size:13px">This sends your ClassDeck teaching screen from the tablet browser to a WebRTC relay gateway, then the gateway publishes to social RTMP platforms. This is the realistic browser-safe way to go live without OBS because YouTube/Facebook/Instagram/TikTok still use RTMP/RTMPS ingest.</p>
+    <div class="row" style="gap:8px;flex-wrap:wrap;margin:6px 0">
+      <span class="badge">Source: ClassDeck workspace</span>
+      <span class="badge">No OBS</span>
+      <span class="badge">No AI API</span>
+      <span class="badge">Works from tablet browser</span>
+    </div>
+    <label>Relay gateway base URL</label>
+    <input class="input" id="tlGateway" placeholder="https://live.yourdomain.com" />
+    <label style="margin-top:8px">Relay secret/token (optional, configured on your relay)</label>
+    <input class="input" id="tlSecret" placeholder="keep this private" type="password" />
+    <div class="row" style="margin-top:8px">
+      <div style="flex:1;min-width:180px">
+        <label>Stream name</label>
+        <input class="input" id="tlStream" placeholder="classdeck" />
+      </div>
+      <div style="flex:1;min-width:180px">
+        <label>Output format</label>
+        <select class="input" id="tlFormat">
+          <option value="landscape">Landscape 16:9 — YouTube/Facebook</option>
+          <option value="vertical">Vertical 9:16 — TikTok/Instagram/Reels style</option>
+        </select>
+      </div>
+    </div>
+    <hr class="sep" />
+    <label>Destinations (full RTMP/RTMPS publish URL, including stream key)</label>
+    <p style="font-size:11.5px;color:var(--text-dim);margin:4px 0">Keys are stored only in this browser if you tick remember. Never commit them to GitHub. Leave a destination blank if not used.</p>
+    <input class="input tlDest" data-name="youtube" placeholder="YouTube full URL e.g. rtmp://a.rtmp.youtube.com/live2/YOUR-KEY" />
+    <input class="input tlDest" data-name="facebook" placeholder="Facebook full RTMPS URL from Live Producer" style="margin-top:6px" />
+    <input class="input tlDest" data-name="instagram" placeholder="Instagram full RTMPS URL from Live Producer" style="margin-top:6px" />
+    <input class="input tlDest" data-name="tiktok" placeholder="TikTok full RTMP URL from Live Center/Producer" style="margin-top:6px" />
+    <input class="input tlDest" data-name="custom" placeholder="Custom RTMP/RTMPS publish URL" style="margin-top:6px" />
+    <label style="display:flex;align-items:center;gap:8px;margin-top:8px"><input type="checkbox" id="tlRemember" /> Remember gateway and destinations on this tablet</label>
+    <div class="row" style="margin-top:10px">
+      <button class="btn primary" id="tlStart">📡 Start tablet social live</button>
+      <button class="btn danger" id="tlStop">⏹ Stop social live</button>
+      <button class="btn" id="tlHealth">Check relay</button>
+      <button class="btn" onclick="closeModal('#mTabletLive')">Close</button>
+    </div>
+    <p id="tlStatus" style="font-size:12.5px;color:var(--text-dim);margin-top:8px">Deploy the included relay in <code>relay/no-obs-social-relay/</code>, paste its URL here, then start.</p>
+    <hr class="sep" />
+    <b style="font-size:13px">No relay yet?</b>
+    <p style="font-size:12px;color:var(--text-dim);margin:4px 0">Use the Social Centre for setup steps, or open a browser-based studio such as YouTube Live Control Room, Facebook Live Producer, Instagram Live Producer, TikTok Live Center, StreamYard or Restream. Those are no-OBS options but may have account/eligibility/free-plan limits.</p>
+    <div class="row">
+      <button class="btn small" id="tlOpenCentre">🌐 Open Social Centre</button>
+      <a class="btn small" href="https://studio.youtube.com" target="_blank" rel="noopener">YouTube Studio</a>
+      <a class="btn small" href="https://www.facebook.com/live/producer" target="_blank" rel="noopener">Facebook Live</a>
+      <a class="btn small" href="https://www.instagram.com" target="_blank" rel="noopener">Instagram</a>
+      <a class="btn small" href="https://livecenter.tiktok.com" target="_blank" rel="noopener">TikTok Live</a>
+    </div>
+  </div>
+</div>
+
 <div class="modal-back" id="mNoise">
   <div class="modal">
     <h3>🔊 Noise meter</h3>
@@ -927,6 +994,7 @@ Not sure</textarea>
 <script src="js/toolkit-data.js"></script>
 <script src="js/toolkit-data2.js"></script>
 <script src="js/toolkit-ext.js"></script>
+<script src="js/security-config.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/rtc.js"></script>
 <script src="js/teach.js"></script>

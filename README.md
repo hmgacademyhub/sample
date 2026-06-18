@@ -1,4 +1,6 @@
-# HMG ACADEMY CLASS DECK (v9) — Split-Screen Teaching Studio 🧑‍🏫
+# HMG ACADEMY CLASS DECK — ClassDesk v3 (v11) 🧑‍🏫📡🛡
+
+**ClassDesk v3** builds on the existing HMG Academy ClassDeck without removing previous features or changing the UI/layout philosophy. It adds stronger subscription/security protection, optional Cloudflare Worker license gateway, forensic watermarking, secure invite links, security audit export, and Picture-in-Picture continuity — while keeping the direct tablet screen/workspace broadcast and no-OBS tablet social live relay workflow from ClassDesk v2.
 
 **By Adewale Samson Adeagbo** — AI-Augmented Solutions Developer · Data Scientist · STEM Educator (Lagos, Nigeria).
 Founder of HMG ACADEMY and the HMG family of brands:
@@ -22,18 +24,23 @@ No accounts. No servers to pay for. No AI APIs. 100% free-tier tools.
 
 ---
 
-## 🆕 What's new in v9 — screen share, social live, captions and enterprise cleanup
+## 🆕 What's new in ClassDesk v3 — security, subscription protection and PiP
 
 | Feature | Detailed explanation |
 |---|---|
-| **🖥 Built-in full screen sharing** | In **Settings → Broadcast mode**, choose **Share screen**, save, then tap **▶ Go Live**. Students join via the normal ClassDeck invite link and see the teacher's selected screen/window directly inside ClassDeck — no Google Meet/Zoom required. Composite mode remains the recommended tablet-safe default. |
-| **📡 Social Live Centre (`stream.html`)** | A new free OBS/RTMP workflow centre helps teachers stream ClassDeck classes to YouTube, Facebook, TikTok, Instagram or custom RTMP destinations. It provides a clean OBS output link, screen-capture test, platform checklist, setup-note download, privacy checklist and `.ics` calendar export. Stream keys stay in OBS/platform dashboards, not in ClassDeck. |
+| **🛡 Optional online license gateway** | Deploy `security/license-gateway-worker/` on Cloudflare Workers free tier and set `js/security-config.js` to `licenseMode: "strict"`. Trials, subscriptions, device limits and account blocks are checked server-side instead of relying only on localStorage. |
+| **🔐 Secure invite links** | A new Settings option can require a secret invite token. Students who only know the room code cannot join unless they use the teacher's current secure invite link. |
+| **🚫 Anti-piracy forensic watermark** | Broadcasts and recordings can include a faint repeated watermark with teacher/room details to discourage unauthorised resale or recording. |
+| **🛡 Security audit CSV** | The Students drawer exports a local audit log: studio open, class start/end, waiting room, student joins/leaves, media events and PiP activity. |
+| **▣ Picture-in-Picture continuity** | A top-bar PiP button opens a small live preview of the ClassDeck teaching canvas. Teachers can keep it visible while switching/minimising where the browser supports PiP. |
+| **🖥 Direct tablet screen/workspace sharing** | Teachers can tap **⚙ Settings → 🖥 Try full tablet screen**. If the tablet browser supports full system capture, ClassDeck shares the selected screen/window directly to students. If Android/browser blocks full-system capture, ClassDeck automatically falls back to its reliable tablet-safe workspace capture — students still see the whole ClassDeck teaching screen without Google Meet/Zoom. |
+| **📡 Tablet Social Live — no OBS** | Teacher Studio now has **⚙ Settings → 📡 Tablet Live**. The tablet sends the ClassDeck teaching workspace through WebRTC/WHIP to the included open-source relay (`relay/no-obs-social-relay/`), and the relay publishes to YouTube, Facebook, TikTok, Instagram or custom RTMP/RTMPS destinations. No OBS is needed on the tablet. |
 | **CC Live captions + transcript** | The Chat drawer now includes **CC Live captions**. Where the browser supports Web Speech API, the teacher's speech is captioned for students in a bottom banner. Final lines can be downloaded as a transcript. No AI API is used. |
 | **🔊 Noise meter now implemented** | The Students drawer includes a local microphone noise meter with threshold control. When active, it is drawn into the broadcast/recording overlay so students can self-regulate. Nothing is recorded or uploaded. |
 | **WebRTC stability fixes** | Teacher stage/camera calls are now closed when replaced, reducing duplicate media calls and long-class connection leaks. Ending a class now clears the room state and stops stage video tracks more cleanly. |
 | **Better reports** | Class reports now include hands raised, reactions and caption-line counts in addition to existing attendance, chat, poll, quiz and leaderboard information. |
 
-See `docs/ENHANCEMENT_REPORT_V9.md` for the full diagnosis and implementation notes.
+See `docs/CLASSDESK_V3_SECURITY_PIP_REPORT.md`, `docs/CLASSDESK_V2_REPORT.md` and `docs/ENHANCEMENT_REPORT_V9.md` for full diagnosis and implementation notes.
 
 ---
 
@@ -77,7 +84,7 @@ nothing for Android to kill.
 | `teach.html` | teacher | The Studio: split-screen workspace + built-in live class controls |
 | `teach.html?solo=1` | teacher | Same workspace without live-class chrome (prep / in-person / OBS clean output) |
 | `join.html` | students | Full-screen class view for the built-in classroom (room code / link / QR) |
-| `stream.html` | teacher/media team | Social Live Centre: OBS/RTMP checklist, clean output link, screen-capture test and setup-note generator |
+| `stream.html` | teacher/media team | Tablet Social Live Centre: no-OBS WebRTC relay workflow, platform notes, search-friendly HMG brand page and browser-studio fallbacks |
 
 ---
 
