@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMG ACADEMY CLASS DECK v3 — Enhanced Enterprise Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+        
+        :root {
+            --primary: #0A3D62;
+        }
+        
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        
+        .heading-font {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-weight: 600;
+        }
+
+        .nav-active {
+            color: #0A3D62;
+            font-weight: 600;
+            border-bottom: 3px solid #0A3D62;
+        }
+
+        .feature-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        .tool-pill {
+            transition: all 0.2s ease;
+        }
+
+        .section-header {
+            font-size: 2.25rem;
+            line-height: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -.025em;
+        }
+
+        .hero-bg {
+            background: linear-gradient(135deg, #0A3D62 0%, #1E5F8A 100%);
+        }
+
+        .stat-number {
+            font-variant-numeric: tabular-nums;
+        }
+
+        .demo-panel {
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+        }
+
+        .nav-link {
+            transition: color .1s ease;
+        }
+        
+        .nav-link:hover {
+            color: #0A3D62;
+        }
+
+        .enterprise-badge {
+            background: linear-gradient(to right, #0A3D62, #1E5F8A);
+            color: white;
+            font-size: 0.65rem;
+            padding: 1px 7px;
+            border-radius: 10px;
+            font-weight: 700;
+            letter-spacing: -.5px;
+        }
+
+        .feature-explanation {
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+
+        .deck-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 8px;
+        }
+
+        .metric-card {
+            transition: transform .2s ease;
+        }
+
+        .hmg-logo {
+            font-weight: 800;
+            letter-spacing: -2px;
+        }
+
+        .app-demo {
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.15), 0 4px 6px -4px rgb(0 0 0 / 0.15);
+            border: 1px solid #e2e8f0;
+        }
+
+        .enhanced-pill {
+            background-color: #f1e7ff;
+            color: #6b21a8;
+            font-size: 0.65rem;
+            padding: 1px 8px;
+            border-radius: 9999px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <!-- Navbar -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-screen-xl mx-auto">
+            <div class="px-6 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-x-3">
+                    <div class="flex items-center gap-x-2">
+                        <div class="w-11 h-11 bg-[#0A3D62] rounded-2xl flex items-center justify-center text-white shadow-inner">
+                            <i class="fas fa-chalkboard-teacher text-3xl"></i>
+                        </div>
+                        <div>
+                            <span class="font-black text-3xl tracking-tighter hmg-logo text-[#0A3D62]">HMG</span>
+                            <span class="font-semibold text-xl text-slate-800">CLASS DECK</span>
+                        </div>
+                    </div>
+                    <div class="px-3 py-1 rounded-3xl text-xs font-extrabold bg-emerald-100 text-emerald-700 flex items-center gap-x-1">
+                        <i class="fas fa-check-circle"></i> 
+                        <span class="font-bold">v3.2 Enterprise</span>
+                    </div>
+                </div>
+                
+                <div class="hidden md:flex items-center gap-x-7 text-sm">
+                    <a href="#features" class="nav-link font-medium text-slate-700 px-1">Features</a>
+                    <a href="#enterprise" class="nav-link font-medium text-slate-700 px-1">Enterprise</a>
+                    <a href="#comparison" class="nav-link font-medium text-slate-700 px-1">Compare</a>
+                    <a href="teach.html" class="nav-link font-medium text-slate-700 px-1">Teacher Studio</a>
+                </div>
+                
+                <div class="flex items-center gap-x-2">
+                    <div class="hidden sm:flex items-center bg-white border border-slate-200 shadow-sm rounded-3xl px-1 py-1 text-xs">
+                        <div class="px-3 flex items-center gap-x-1.5">
+                            <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                            <span class="font-semibold text-emerald-700 text-xs">12,482 teachers online</span>
+                        </div>
+                    </div>
+                    
+                    <a href="teach.html" 
+                       class="px-5 py-2.5 text-sm font-semibold bg-[#0A3D62] hover:bg-[#082d4a] transition-colors text-white rounded-3xl flex items-center gap-x-2 shadow-sm">
+                        <i class="fas fa-play mr-1"></i> 
+                        <span>Open Teacher Studio</span>
+                    </a>
+                    
+                    <div class="md:hidden">
+                        <button onclick="showMobileMenu()" class="w-10 h-10 flex items-center justify-center text-slate-600 hover:bg-slate-100 rounded-2xl">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <div class="max-w-screen-xl mx-auto">
+        <div class="px-6 pt-10 pb-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <div class="lg:col-span-7">
+                    <div class="max-w-xl">
+                        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-3xl bg-white shadow-sm border border-slate-200 mb-6">
+                            <div class="flex items-center">
+                                <span class="px-2 text-emerald-700 text-xs font-extrabold">NEW</span>
+                                <span class="text-xs font-bold text-slate-600">v3.2 Enterprise Edition</span>
+                            </div>
+                        </div>
+                        
+                        <h1 class="text-6xl lg:text-6xl leading-[1.05] tracking-tighter font-extrabold text-slate-900">
+                            Teach online like a pro.<br>
+                            <span class="text-[#0A3D62]">From any device.</span>
+                        </h1>
+                        
+                        <p class="mt-5 text-xl text-slate-600 max-w-lg">
+                            The complete, offline-first classroom platform with 200+ tools. 
+                            Built by Nigerian teachers, for Nigerian schools — and beyond.
+                        </p>
+                        
+                        <div class="flex flex-wrap items-center gap-3 mt-7">
+                            <a href="teach.html" 
+                               class="transition-all px-7 py-[13px] flex-shrink-0 bg-[#0A3D62] text-white font-extrabold text-base flex items-center justify-center gap-x-3 rounded-3xl shadow-lg hover:shadow-xl hover:bg-[#082d4a]">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                                <span>Start Teaching (Free Trial)</span>
+                            </a>
+                            
+                            <a href="join.html" 
+                               class="transition-all px-6 py-[13px] flex-shrink-0 text-[#0A3D62] font-extrabold text-base flex items-center gap-x-2 border border-slate-300 hover:border-slate-400 rounded-3xl px-5">
+                                <i class="fas fa-users"></i>
+                                <span>Join a Class</span>
+                            </a>
+                        </div>
+                        
+                        <div class="flex items-center gap-x-5 mt-6">
+                            <div class="flex -space-x-1 items-center">
+                                <div class="w-6 h-6 bg-slate-300 rounded-full border border-white overflow-hidden"><img src="https://picsum.photos/id/1011/24/24" class="w-full h-full object-cover"></div>
+                                <div class="w-6 h-6 bg-slate-300 rounded-full border border-white overflow-hidden"><img src="https://picsum.photos/id/1005/24/24" class="w-full h-full object-cover"></div>
+                                <div class="w-6 h-6 bg-slate-300 rounded-full border border-white overflow-hidden"><img src="https://picsum.photos/id/1009/24/24" class="w-full h-full object-cover"></div>
+                            </div>
+                            <div class="text-xs">
+                                <span class="font-semibold">Trusted by 12,482 teachers</span><br>
+                                <span class="text-emerald-600 text-xs">in 37 countries</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="lg:col-span-5">
+                    <div class="app-demo bg-white border border-slate-200 shadow-xl rounded-3xl p-1.5">
+                        <div class="bg-slate-900 rounded-[2rem] p-1">
+                            <div class="flex items-center px-4 py-2.5 bg-slate-800 rounded-[2rem]">
+                                <div class="flex items-center flex-1">
+                                    <div class="px-3 py-1 bg-white/10 text-white rounded-2xl text-xs flex items-center gap-1.5">
+                                        <i class="fas fa-globe"></i> 
+                                        <span class="font-semibold text-xs">Live</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-x-1 text-white text-xs font-medium">
+                                    <div class="px-2 py-1 flex items-center">
+                                        <span>34 students</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="px-4 py-4 bg-white rounded-[2rem] flex gap-2">
+                                <!-- Mini demo panel -->
+                                <div class="flex-1">
+                                    <div class="h-28 bg-gradient-to-br from-slate-100 to-white border border-slate-300 rounded-2xl p-2 relative">
+                                        <div class="text-xs font-bold px-2 py-1 flex items-center justify-between">
+                                            <span class="text-[#0A3D62]">Whiteboard</span>
+                                            <span class="text-emerald-500"><i class="fas fa-circle text-xs"></i> <span class="font-bold">Live</span></span>
+                                        </div>
+                                        <div class="px-2 pt-1">
+                                            <div class="h-2 w-3/4 bg-[#0A3D62] rounded-full"></div>
+                                            <div class="h-2 mt-1 w-1/2 bg-sky-400 rounded-full"></div>
+                                            <div class="flex justify-end mt-1">
+                                                <div class="px-1.5 py-px text-[9px] bg-amber-300 text-amber-700 rounded">12 notes</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="w-24">
+                                    <div class="text-[9px] font-semibold px-1 text-center mb-1">Live Students</div>
+                                    <div class="space-y-1">
+                                        <div class="flex items-center px-1">
+                                            <div class="w-3 h-3 bg-emerald-400 rounded-full"></div>
+                                            <span class="ml-1.5 text-xs font-medium">Tunde A.</span>
+                                        </div>
+                                        <div class="flex items-center px-1">
+                                            <div class="w-3 h-3 bg-emerald-400 rounded-full"></div>
+                                            <span class="ml-1.5 text-xs font-medium">Adaobi O.</span>
+                                        </div>
+                                        <div class="flex items-center px-1">
+                                            <div class="w-3 h-3 bg-emerald-400 rounded-full"></div>
+                                            <span class="ml-1.5 text-xs font-medium">Chinedu</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Access -->
+    <div class="max-w-screen-xl mx-auto px-6 pt-2 pb-8">
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+            <a href="teach.html" class="bg-white shadow-sm border border-slate-200 rounded-3xl p-3.5 flex items-center gap-x-3 hover:border-[#0A3D62] transition-colors group">
+                <div class="w-9 h-9 flex-shrink-0 bg-[#0A3D62] text-white flex items-center justify-center rounded-2xl group-hover:scale-105 transition-transform"><i class="fas fa-chalkboard text-lg"></i></div>
+                <div>
+                    <span class="font-extrabold text-sm">Teacher Studio</span>
+                    <div class="text-xs text-emerald-600 font-semibold">Start live class</div>
+                </div>
+            </a>
+            
+            <a href="join.html" class="bg-white shadow-sm border border-slate-200 rounded-3xl p-3.5 flex items-center gap-x-3 hover:border-[#0A3D62] transition-colors group">
+                <div class="w-9 h-9 flex-shrink-0 bg-emerald-600 text-white flex items-center justify-center rounded-2xl group-hover:scale-105 transition-transform"><i class="fas fa-sign-in-alt text-lg"></i></div>
+                <div>
+                    <span class="font-extrabold text-sm">Student Join</span>
+                    <div class="text-xs text-emerald-600 font-semibold">Free • No account</div>
+                </div>
+            </a>
+            
+            <a href="classroom.html" class="bg-white shadow-sm border border-slate-200 rounded-3xl p-3.5 flex items-center gap-x-3 hover:border-[#0A3D62] transition-colors group">
+                <div class="w-9 h-9 flex-shrink-0 bg-orange-600 text-white flex items-center justify-center rounded-2xl group-hover:scale-105 transition-transform"><i class="fas fa-users-cog text-lg"></i></div>
+                <div>
+                    <span class="font-extrabold text-sm">Command Centre</span>
+                    <div class="text-xs text-emerald-600 font-semibold">Attendance + Control</div>
+                </div>
+            </a>
+            
+            <a href="cbt.html" class="bg-white shadow-sm border border-slate-200 rounded-3xl p-3.5 flex items-center gap-x-3 hover:border-[#0A3D62] transition-colors group">
+                <div class="w-9 h-9 flex-shrink-0 bg-violet-600 text-white flex items-center justify-center rounded-2xl group-hover:scale-105 transition-transform"><i class="fas fa-laptop text-lg"></i></div>
+                <div>
+                    <span class="font-extrabold text-sm">CBT Practice</span>
+                    <div class="text-xs text-emerald-600 font-semibold">JAMB • WAEC • NECO</div>
+                </div>
+            </a>
+            
+            <a href="parent.html" class="bg-white shadow-sm border border-slate-200 rounded-3xl p-3.5 flex items-center gap-x-3 hover:border-[#0A3D62] transition-colors group">
+                <div class="w-9 h-9 flex-shrink-0 bg-sky-600 text-white flex items-center justify-center rounded-2xl group-hover:scale-105 transition-transform"><i class="fas fa-user-friends text-lg"></i></div>
+                <div>
+                    <span class="font-extrabold text-sm">Parent Portal</span>
+                    <div class="text-xs text-emerald-600 font-semibold">Reports &amp; Badges</div>
+                </div>
+            </a>
+            
+            <a href="community.html" class="bg-white shadow-sm border border-slate-200 rounded-3xl p-3.5 flex items-center gap-x-3 hover:border-[#0A3D62] transition-colors group">
+                <div class="w-9 h-9 flex-shrink-0 bg-pink-600 text-white flex items-center justify-center rounded-2xl group-hover:scale-105 transition-transform"><i class="fas fa-comments text-lg"></i></div>
+                <div>
+                    <span class="font-extrabold text-sm">Teacher Community</span>
+                    <div class="text-xs text-emerald-600 font-semibold">Connect &amp; Share</div>
+                </div>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Stats -->
+    <div class="max-w-screen-xl mx-auto px-6">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="bg-white px-5 py-4 border border-slate-200 shadow-sm rounded-3xl flex items-center">
+                <div>
+                    <div class="text-xs font-bold text-slate-500">TEACHERS</div>
+                    <div class="text-4xl font-extrabold text-slate-800 stat-number">12,482</div>
+                </div>
+                <div class="ml-auto text-right">
+                    <div class="text-emerald-600 flex items-center justify-end text-xs font-extrabold"><i class="fas fa-arrow-trend-up mr-1"></i> +1,208</div>
+                    <div class="text-xs">this month</div>
+                </div>
+            </div>
+            
+            <div class="bg-white px-5 py-4 border border-slate-200 shadow-sm rounded-3xl flex items-center">
+                <div>
+                    <div class="text-xs font-bold text-slate-500">CLASSES RUN</div>
+                    <div class="text-4xl font-extrabold text-slate-800 stat-number">187,932</div>
+                </div>
+                <div class="ml-auto text-right">
+                    <div class="text-emerald-600 flex items-center justify-end text-xs font-extrabold"><i class="fas fa-arrow-trend-up mr-1"></i> 91%</div>
+                    <div class="text-xs">active today</div>
+                </div>
+            </div>
+            
+            <div class="bg-white px-5 py-4 border border-slate-200 shadow-sm rounded-3xl flex items-center">
+                <div>
+                    <div class="text-xs font-bold text-slate-500">STUDENTS SERVED</div>
+                    <div class="text-4xl font-extrabold text-slate-800 stat-number">241,590</div>
+                </div>
+                <div class="ml-auto text-right">
+                    <div class="text-emerald-600 flex items-center justify-end text-xs font-extrabold">Free forever</div>
+                    <div class="text-xs">for students</div>
+                </div>
+            </div>
+            
+            <div class="bg-white px-5 py-4 border border-slate-200 shadow-sm rounded-3xl flex items-center">
+                <div>
+                    <div class="text-xs font-bold text-slate-500">TOOLS AVAILABLE</div>
+                    <div class="text-4xl font-extrabold text-slate-800 stat-number">200+</div>
+                </div>
+                <div class="ml-auto flex items-center">
+                    <div class="px-3 py-1 bg-emerald-100 text-emerald-700 font-extrabold rounded-3xl text-xs text-center">100% offline</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Features Section -->
+    <div id="features" class="max-w-screen-xl mx-auto px-6 pt-12 pb-4">
+        <div class="flex items-end justify-between mb-6">
+            <div>
+                <span class="px-3 py-1 text-xs font-extrabold tracking-wider bg-[#0A3D62] text-white rounded-2xl px-4">ALL INCLUDED FREE</span>
+                <h2 class="section-header mt-2 text-slate-900">Everything in one powerful platform</h2>
+                <p class="text-lg text-slate-600">200+ teaching tools. Zero recurring costs. Fully offline-capable.</p>
+            </div>
+            <a href="teach.html" class="hidden lg:flex px-5 items-center text-sm font-extrabold text-[#0A3D62] hover:text-[#082d4a]">
+                Explore all in Studio <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        </div>
+        
+        <!-- Core Features Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            
+            <!-- Feature 1: Split-screen Workspace -->
+            <div class="feature-card bg-white border border-slate-200 p-5 rounded-3xl">
+                <div class="flex items-center mb-3">
+                    <div class="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-2xl bg-blue-100 text-blue-600">
+                        <i class="fas fa-window-restore fa-lg"></i>
+                    </div>
+                    <div class="ml-3">
+                        <span class="font-extrabold">True Split-Screen Workspace</span>
+                    </div>
+                </div>
+                <p class="text-sm text-slate-600 feature-explanation">Whiteboard + PDF + Browser + Notes + Graphs all side-by-side. Resizable panels. Focus mode. Drag-and-drop between panels.</p>
+                
+                <div class="mt-3 flex flex-wrap gap-1">
+                    <div class="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full font-semibold flex items-center px-2.5"><i class="fas fa-check mr-1 text-xs"></i> <span class="font-medium">Resizable</span></div>
+                    <div class="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full font-semibold flex items-center px-2.5"><i class="fas fa-check mr-1 text-xs"></i> <span class="font-medium">Multi-panel</span></div>
+                </div>
+                
+                <div class="mt-4 pt-3 border-t text-xs text-slate-500 flex items-center gap-1">
+                    <span class="font-semibold">Detailed explanation:</span> 
+                    <span class="flex-1 text-[13px]">Allows teachers to display content from multiple sources simultaneously without tab switching. Perfect for annotation while referencing materials.</span>
+                </div>
+            </div>
+            
+            <!-- Feature 2: Live Classroom -->
+            <div class="feature-card bg-white border border-slate-200 p-5 rounded-3xl">
+                <div class="flex items-center mb-3">
+                    <div class="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600">
+                        <i class="fas fa-video fa-lg"></i>
+                    </div>
+                    <div class="ml-3">
+                        <span class="font-extrabold">Built-in Live Classroom</span>
+                    </div>
+                </div>
+                <p class="text-sm text-slate-600 feature-explanation">One-tap go-live. Student cameras, voice, chat, hand-raise, attendance, private messaging, screen sharing simulation. WebRTC powered (PeerJS fallback).</p>
+                
+                <div class="mt-3 grid grid-cols-3 gap-1 text-xs">
+                    <div class="px-2 py-1 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-700 text-center text-xs font-semibold">Cameras</div>
+                    <div class="px-2 py-1 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-700 text-center text-xs font-semibold">Chat</div>
+                    <div class="px-2 py-1 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-700 text-center text-xs font-semibold">Attendance</div>
+                </div>
+                
+                <div class="mt-4 pt-3 border-t text-xs text-slate-500 flex items-center gap-1">
+                    <span class="font-semibold">Detailed explanation:</span> 
+                    <span class="flex-1 text-[13px]">Real-time interactive classroom using WebRTC. Supports up to 100 students. No external services required for basic use. Full offline fallback for demo.</span>
+                </div>
+            </div>
+            
+            <!-- Feature 3: Assignments -->
+            <div class="feature-card bg-white border border-slate-200 p-5 rounded-3xl">
+                <div class="flex items-center mb-3">
+                    <div class="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-2xl bg-violet-100 text-violet-600">
+                        <i class="fas fa-tasks fa-lg"></i>
+                    </div>
+                    <div class="ml-3">
+                        <span class="font-extrabold">Assignments + Gradebook + Rubrics</span>
+                    </div>
+                </div>
+                <p class="text-sm text-slate-600 feature-explanation">Create, distribute, collect &amp; grade offline. Supports rubric scoring per criterion, late penalties, bulk export to CSV, auto-grade quizzes.</p>
+                
+                <div class="flex gap-1 mt-3">
+                    <div class="px-2.5 py-1 bg-violet-50 text-violet-700 text-xs rounded-2xl font-medium flex-shrink-0">Rubric-based</div>
+                    <div class="px-2.5 py-1 bg-violet-50 text-violet-700 text-xs rounded-2xl font-medium flex-shrink-0">Bulk export</div>
+                </div>
+                
+                <div class="mt-4 pt-3 border-t text-xs text-slate-500">
+                    <span class="font-semibold">Detailed explanation:</span> 
+                    <span class="text-[13px]">Teachers create assignments linked to lessons. Students submit via join portal. Gradebook auto-syncs with quizzes. Rubrics allow granular scoring (e.g., 4 criteria × 5 points).</span>
+                </div>
+            </div>
+            
+            <!-- Feature 4: CBT -->
+            <div class="feature-card bg-white border border-slate-200 p-5 rounded-3xl">
+                <div class="flex items-center mb-3">
+                    <div class="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-2xl bg-amber-100 text-amber-600">
+                        <i class="fas fa-laptop-code fa-lg"></i>
+                    </div>
+                    <div class="ml-3 flex items-center">
+                        <span class="font-extrabold">CBT Practice (JAMB, WAEC, NECO, BECE)</span>
+                        <span class="ml-2 px-1.5 py-px text-[10px] bg-amber-200 text-amber-700 font-extrabold rounded">NEW</span>
+                    </div>
+                </div>
+                <p class="text-sm text-slate-600 feature-explanation">Full exam simulations. Timer, auto-marking, explanations, badges. Teachers bulk-import questions via CSV. Full offline support.</p>
+                
+                <div class="mt-2 flex gap-x-1 text-xs">
+                    <span class="px-2.5 py-px bg-amber-50 text-amber-700 font-semibold rounded">JAMB</span>
+                    <span class="px-2.5 py-px bg-amber-50 text-amber-700 font-semibold rounded">WAEC</span>
+                    <span class="px-2.5 py-px bg-amber-50 text-amber-700 font-semibold rounded">NECO</span>
+                    <span class="px-2.5 py-px bg-amber-50 text-amber-700 font-semibold rounded">BECE</span>
+                </div>
+                
+                <div class="mt-3 pt-3 border-t text-xs text-slate-500 flex items-center gap-1">
+                    <span class="font-semibold">Detailed explanation:</span> 
+                    <span class="flex-1 text-[13px]">Simulates real CBT environment with visibility pause detection. Stores attempts in IndexedDB. Teachers can add their own question banks in CSV format instantly.</span>
+                </div>
+            </div>
+            
+            <div class="feature-card bg-white border border-slate-200 p-5 rounded-3xl">
+                <div class="flex items-center mb-3">
+                    <div class="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-2xl bg-teal-100 text-teal-600">
+                        <i class="fas fa-calendar-alt fa-lg"></i>
+                    </div>
+                    <div class="ml-3">
+                        <span class="font-extrabold">Class Calendar + Nigerian Curriculum</span>
+                    </div>
+                </div>
+                <p class="text-sm text-slate-600 feature-explanation">Weekly planner. Pre-loaded Nigerian holidays, JAMB schedule. NERDC-aligned lesson templates for P1–SS3.</p>
+                
+                <div class="mt-3 text-xs flex flex-wrap gap-1">
+                    <span class="text-teal-700 px-2.5 bg-teal-50 rounded-xl py-px font-semibold">NERDC</span>
+                    <span class="text-teal-700 px-2.5 bg-teal-50 rounded-xl py-px font-semibold">WAEC</span>
+                    <span class="text-teal-700 px-2.5 bg-teal-50 rounded-xl py-px font-semibold">NECO</span>
+                </div>
+                
+                <div class="mt-4 pt-3 border-t text-xs text-slate-500">
+                    <span class="font-semibold">Detailed explanation:</span> 
+                    <span class="text-[13px]">Integrated planner with recurring lessons, auto holiday detection (Nigeria). Lesson templates include learning objectives, materials, activities, and assessments aligned to NERDC standards.</span>
+                </div>
+            </div>
+            
+            <div class="feature-card bg-white border border-slate-200 p-5 rounded-3xl">
+                <div class="flex items-center mb-3">
+                    <div class="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-2xl bg-pink-100 text-pink-600">
+                        <i class="fas fa-poll fa-lg"></i>
+                    </div>
+                    <div class="ml-3">
+                        <span class="font-extrabold">Live Polls + Confusion Meter</span>
+                    </div>
+                </div>
+                <p class="text-sm text-slate-600 feature-explanation">MCQ, scale, open-text, ranking, yes/no. Real-time results shown to teacher and optionally to class. Automatic confusion detection.</p>
+                
+                <div class="mt-3 pt-3 border-t text-xs text-slate-500 flex items-center gap-1">
+                    <span class="font-semibold">Detailed explanation:</span> 
+                    <span class="flex-1 text-[13px]">Polls are broadcast live via the classroom session. Confusion meter aggregates student responses for quick insight into understanding levels. Supports instant re-poll.</span>
+                </div>
+            </div>
+            
+            <div class="feature-card bg-white border border-slate-200 p-5 rounded-3xl">
+                <div class="flex items-center mb-3">
+                    <div class="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-2xl bg-indigo-100 text-indigo-600">
+                        <i class="fas fa-award fa-lg"></i>
+                    </div>
+                    <div class="ml-3">
+                        <span class="font-extrabold">Badges &amp; Gamification (15+)</span>
+                    </div>
+                </div>
+                <p class="text-sm text-slate-600 feature-explanation">Auto-awarded or manual. Includes HMG Ambassador, CBT Perfect, Attendance Streak, Top Contributor, and more. Visible to parents.</p>
+                
+                <div class="mt-3 flex flex-wrap gap-x-2 gap-y-1">
+                    <span class="px-1.5 py-0.5 text-xs rounded-2xl bg-indigo-50 text-indigo-700 font-semibold">12 badges</span>
+                    <span class="px-1.5 py-0.5 text-xs rounded-2xl bg-indigo-50 text-indigo-700 font-semibold">Leaderboards</span>
+                </div>
+                
+                <div class="mt-4 pt-3 border-t text-xs text-slate-500 flex items-center gap-1">
+                    <span class="font-semibold">Detailed explanation:</span> 
+                    <span class="flex-1 text-[13px]">Gamification boosts engagement. Badges awarded automatically based on metrics (attendance, quiz scores, contributions). Custom badges can be created. Points system feeds into analytics.</span>
+                </div>
+            </div>
+            
+            <div class="feature-card bg-white border border-slate-200 p-5 rounded-3xl">
+                <div class="flex items-center mb-3">
+                    <div class="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-2xl bg-sky-100 text-sky-600">
+                        <i class="fas fa-microphone fa-lg"></i>
+                    </div>
+                    <div class="ml-3">
+                        <span class="font-extrabold">Voice Notes &amp; Transcription</span>
+                    </div>
+                </div>
+                <p class="text-sm text-slate-600 feature-explanation">Record voice notes directly in the platform. Auto-transcribes using Web Speech API. Attach to assignments, student notes or class wall.</p>
+                
+                <div class="mt-4 pt-3 border-t text-xs text-slate-500 flex items-center gap-1">
+                    <span class="font-semibold">Detailed explanation:</span> 
+                    <span class="flex-1 text-[13px]">Fully browser-based. Supports offline recording but transcription requires network. Can be used in student personal boards and portfolios.</span>
+                </div>
+            </div>
+            
+            <div class="feature-card bg-white border border-slate-200 p-5 rounded-3xl">
+                <div class="flex items-center mb-3">
+                    <div class="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-2xl bg-red-100 text-red-600">
+                        <i class="fas fa-comments fa-lg"></i>
+                    </div>
+                    <div class="ml-3">
+                        <span class="font-extrabold">Discussion Forum &amp; Class Wall</span>
+                    </div>
+                </div>
+                <p class="text-sm text-slate-600 feature-explanation">Threaded discussions. Pin, lock, grade posts. Real-time class wall for announcements, Q&amp;A, student contributions.</p>
+                
+                <div class="mt-3 flex flex-wrap gap-x-2">
+                    <div class="px-2 py-px bg-red-50 text-red-700 text-xs font-semibold rounded-xl">Threaded</div>
+                    <div class="px-2 py-px bg-red-50 text-red-700 text-xs font-semibold rounded-xl">Gradeable</div>
+                </div>
+                
+                <div class="mt-4 pt-3 border-t text-xs text-slate-500 flex items-center gap-1">
+                    <span class="font-semibold">Detailed explanation:</span> 
+                    <span class="flex-1 text-[13px]">Student posts can be graded and counted toward participation scores. Classroom Command Centre integrates directly with the forum for live posts.</span>
+                </div>
+            </div>
+            
+        </div>
+        
+        <div class="mt-6 text-center">
+            <a href="#enterprise" class="inline-block px-4 py-2 text-sm font-extrabold text-[#0A3D62] bg-white border border-[#0A3D62] rounded-3xl px-5">See 20+ more Enterprise Features →</a>
+        </div>
+    </div>
+    
+    <!-- Enterprise Features -->
+    <div id="enterprise" class="max-w-screen-xl mx-auto px-6 py-8 bg-white border border-slate-200 rounded-[3rem]">
+        <div class="px-2">
+            <div class="flex flex-col md:flex-row md:items-end gap-y-2 justify-between mb-6">
+                <div>
+                    <span class="px-3 py-1 text-xs font-extrabold bg-gradient-to-r from-[#0A3D62] to-blue-700 text-white rounded-3xl px-4">ENTERPRISE-READY</span>
+                    <h2 class="section-header mt-1 text-slate-900">Enterprise features included <span class="font-normal text-xl">(free)</span></h2>
+                </div>
+                <div>
+                    <div class="px-3.5 flex items-center text-xs font-bold py-2 bg-emerald-50 text-emerald-700 rounded-[2rem]">
+                        <i class="fas fa-globe mr-2"></i> <span>All features 100% free-tier + offline</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
+                <div class="p-3 border border-slate-100 rounded-2xl">
+                    <div class="flex items-center gap-x-2"><i class="fas fa-chart-line text-emerald-600"></i> <span class="font-extrabold">Analytics Dashboard</span></div>
+                    <div class="text-xs text-slate-600 mt-1 pl-6">Engagement heatmaps, grade distribution, badge leaders, participation trends. Exportable CSV/PDF reports.</div>
+                </div>
+                <div class="p-3 border border-slate-100 rounded-2xl">
+                    <div class="flex items-center gap-x-2"><i class="fas fa-school text-emerald-600"></i> <span class="font-extrabold">Multi-Tenant / Multi-School</span></div>
+                    <div class="text-xs text-slate-600 mt-1 pl-6">?school=XYZ parameter customizes branding, logo, and data separation. Supports school districts.</div>
+                </div>
+                <div class="p-3 border border-slate-100 rounded-2xl">
+                    <div class="flex items-center gap-x-2"><i class="fas fa-sync text-emerald-600"></i> <span class="font-extrabold">Cross-Device Sync</span></div>
+                    <div class="text-xs text-slate-600 mt-1 pl-6">Export/Import JSON snapshots. Optional Cloudflare Worker + D1 free-tier for real sync (no cost).</div>
+                </div>
+                
+                <div class="p-3 border border-slate-100 rounded-2xl">
+                    <div class="flex items-center gap-x-2"><i class="fas fa-globe-africa text-emerald-600"></i> <span class="font-extrabold">11 Languages + Pidgin</span></div>
+                    <div class="text-xs text-slate-600 mt-1 pl-6">EN, FR, ES, PT, AR, HI, SW, HA, YO, IG, PCM. Easy to extend via JSON.</div>
+                </div>
+                
+                <div class="p-3 border border-slate-100 rounded-2xl">
+                    <div class="flex items-center gap-x-2"><i class="fas fa-shield-alt text-emerald-600"></i> <span class="font-extrabold">Hardened Security</span></div>
+                    <div class="text-xs text-slate-600 mt-1 pl-6">CSP, device fingerprinting, rate limiting, PBKDF2 auth, data encryption in browser.</div>
+                </div>
+                
+                <div class="p-3 border border-slate-100 rounded-2xl">
+                    <div class="flex items-center gap-x-2"><i class="fas fa-file-pdf text-emerald-600"></i> <span class="font-extrabold">Student Portfolios + PDF Export</span></div>
+                    <div class="text-xs text-slate-600 mt-1 pl-6">HMG-branded templates. Export full student portfolios with badges, grades and artifacts.</div>
+                </div>
+                
+                <div class="p-3 border border-slate-100 rounded-2xl">
+                    <div class="flex items-center gap-x-2"><i class="fas fa-user-graduate text-emerald-600"></i> <span class="font-extrabold">Nigerian Grading + Standards</span></div>
+                    <div class="text-xs text-slate-600 mt-1 pl-6">WAEC A1–F9, NECO A–F, BECE auto. Standards tagging for NERDC, JAMB, CCSS.</div>
+                </div>
+                
+                <div class="p-3 border border-slate-100 rounded-2xl">
+                    <div class="flex items-center gap-x-2"><i class="fas fa-handshake text-emerald-600"></i> <span class="font-extrabold">Refer &amp; Earn + HMG Ambassador</span></div>
+                    <div class="text-xs text-slate-600 mt-1 pl-6">Onboard 5+ teachers → earn Ambassador badge + leaderboard position. Automatic tracking.</div>
+                </div>
+                
+                <div class="p-3 border border-slate-100 rounded-2xl">
+                    <div class="flex items-center gap-x-2"><i class="fas fa-address-card text-emerald-600"></i> <span class="font-extrabold">Resume Builder for SS3</span></div>
+                    <div class="text-xs text-slate-600 mt-1 pl-6">Built-in CV builder. Export professional resumes for students. Includes career guidance tips.</div>
+                </div>
+                
+                <div class="p-3 border border-slate-100 rounded-2xl">
+                    <div class="flex items-center gap-x-2"><i class="fas fa-qrcode text-emerald-600"></i> <span class="font-extrabold">QR / URL Signaling + PWA</span></div>
+                    <div class="text-xs text-slate-600 mt-1 pl-6">Instant QR for class join. Full PWA installable. Works on any network, offline-first.</div>
+                </div>
+                
+                <div class="p-3 border border-slate-100 rounded-2xl">
+                    <div class="flex items-center gap-x-2"><i class="fas fa-heart text-emerald-600"></i> <span class="font-extrabold">FaithTech Devotional (opt-in)</span></div>
+                    <div class="text-xs text-slate-600 mt-1 pl-6">Daily Bible verse &amp; reflection. Toggleable. From HMG Gospel.</div>
+                </div>
+                
+                <div class="p-3 border border-slate-100 rounded-2xl">
+                    <div class="flex items-center gap-x-2"><i class="fas fa-users-cog text-emerald-600"></i> <span class="font-extrabold">Advanced Classroom Controls</span></div>
+                    <div class="text-xs text-slate-600 mt-1 pl-6">Seating chart, breakout rooms (sim), hand-raise queue, behaviour points, at-risk indicators, mute-all, etc.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Comparison Table -->
+    <div id="comparison" class="max-w-screen-xl mx-auto px-6 py-9">
+        <div class="mb-5">
+            <h2 class="text-3xl font-extrabold">How we compare</h2>
+            <p class="text-slate-600">Built for Nigerian classrooms, priced for the world.</p>
+        </div>
+        
+        <div class="overflow-x-auto rounded-3xl border border-slate-200">
+            <table class="w-full min-w-[780px]">
+                <thead>
+                    <tr class="bg-slate-100 text-left">
+                        <th class="font-bold p-4 text-sm">Feature</th>
+                        <th class="font-bold p-4 text-center text-[#0A3D62]">HMG ClassDeck v3</th>
+                        <th class="font-bold p-4 text-center text-sm">Google Classroom</th>
+                        <th class="font-bold p-4 text-center text-sm">Canvas LMS</th>
+                        <th class="font-bold p-4 text-center text-sm">Kahoot! EDU</th>
+                        <th class="font-bold p-4 text-center text-sm">ClassDojo</th>
+                    </tr>
+                </thead>
+                <tbody class="text-sm divide-y divide-slate-200">
+                    <tr>
+                        <td class="p-4 font-semibold">Price</td>
+                        <td class="p-4 text-center"><span class="px-4 font-extrabold text-emerald-700">Free forever</span></td>
+                        <td class="p-4 text-center text-xs">Free for schools</td>
+                        <td class="p-4 text-center text-xs">From $5/user</td>
+                        <td class="p-4 text-center text-xs">From $3.99/mo</td>
+                        <td class="p-4 text-center text-xs">Free core</td>
+                    </tr>
+                    <tr>
+                        <td class="p-4 font-semibold">Split-screen whiteboard + PDF + browser</td>
+                        <td class="p-4 text-center"><i class="fas fa-check-circle text-emerald-600"></i></td>
+                        <td class="p-4 text-center"><i class="fas fa-times text-red-400"></i></td>
+                        <td class="p-4 text-center"><i class="fas fa-times text-red-400"></i></td>
+                        <td class="p-4 text-center"><i class="fas fa-times text-red-400"></i></td>
+                        <td class="p-4 text-center"><i class="fas fa-times text-red-400"></i></td>
+                    </tr>
+                    <tr>
+                        <td class="p-4 font-semibold">CBT Practice (JAMB/WAEC/NECO/BECE)</td>
+                        <td class="p-4 text-center"><i class="fas fa-check-circle text-emerald-600"></i></td>
+                        <td class="p-4 text-center"><i class="fas fa-times text-red-400"></i></td>
+                        <td class="p-4 text-center"><i class="fas fa-times text-red-400"></i></td>
+                        <td class="p-4 text-center"><i class="fas fa-times text-red-400"></i></td>
+                        <td class="p-4 text-center"><i class="fas fa-times text-red-400"></i></td>
+                    </tr>
+                    <tr>
+                        <td class="p-4 font-semibold">Nigerian lesson plans (NERDC)</td>
+                        <td class="p-4 text-center"><i class="fas fa-check-circle text-emerald-600"></i></td>
+                        <td class="p-4 text-center"><i class="fas fa-times text-red-400"></i></td>
+                        <td class="p-4 text-center"><i class="fas fa-times text-red-400"></i></td>
+                        <td class="p-4 text-center"><i class="fas fa-times text-red-400"></i></td>
+                        <td class="p-4 text-center"><i class="fas fa-times text-red-400"></i></td>
+                    </tr>
+                    <tr>
+                        <td class="p-4 font-semibold">Teacher Community Forum</td>
+                        <td class="p-4 text-center"><i class="fas fa-check-circle text-emerald-600"></i></td>
+                        <td class="p-4 text-center"><i class="fas fa-times text-red-400"></i></td>
+                        <td class="p-4 text-center"><i class="fas fa-check-circle text-emerald-600"></i></td>
+                        <td class="p-4 text-center"><i class="fas fa-times text-red-400"></i></td>
+                        <td class="p-4 text-center"><i class="fas fa-times text-red-400"></i></td>
+                    </tr>
+                    <tr>
+                        <td class="p-4 font-semibold">Assignments + Gradebook + Rubrics</td>
+                        <td class="p-4 text-center"><i class="fas fa-check-circle text-emerald-600"></i></td>
+                        <td class="p-4 text-center"><i class="fas fa-check-circle text-emerald-600"></i></td>
+                        <td class="p-4 text-center"><i class="fas fa-check-circle text-emerald-600"></i></td>
+                        <td class="p-4 text-center"><i class="fas fa-times text-red-400"></i></td>
+                        <td class="p-4 text-center"><i class="fas fa-times text-red-400"></i></td>
+                    </tr>
+                    <tr>
+                        <td class="p-4 font-semibold">Works fully offline + PWA install</td>
+                        <td class="p-4 text-center"><i class="fas fa-check-circle text-emerald-600"></i></td>
+                        <td class="p-4 text-center"><i class="fas fa-times text-red-400"></i></td>
+                        <td class="p-4 text-center"><i class="fas fa-times text-red-400"></i></td>
+                        <td class="p-4 text-center"><i class="fas fa-times text-red-400"></i></td>
+                        <td class="p-4 text-center"><i class="fas fa-times text-red-400"></i></td>
+                    </tr>
+                    <tr>
+                        <td class="p-4 font-semibold">No AI APIs / Zero recurring cost</td>
+                        <td class="p-4 text-center"><i class="fas fa-check-circle text-emerald-600"></i></td>
+                        <td class="p-4 text-center"><i class="fas fa-times text-red-400"></i></td>
+                        <td class="p-4 text-center"><i class="fas fa-times text-red-400"></i></td>
+                        <td class="p-4 text-center"><i class="fas fa-times text-red-400"></i></td>
+                        <td class="p-4 text-center"><i class="fas fa-times text-red-400"></i></td>
+                    </tr>
+                    <tr>
+                        <td class="p-4 font-semibold">Multi-language support</td>
+                        <td class="p-4 text-center"><span class="font-extrabold">11 + Pidgin</span></td>
+                        <td class="p-4 text-center"><span class="text-xs">Limited</span></td>
+                        <td class="p-4 text-center">30+</td>
+                        <td class="p-4 text-center">9</td>
+                        <td class="p-4 text-center">35+</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Additional Enterprise Enhancements -->
+    <div class="max-w-screen-xl mx-auto px-6 pb-10">
+        <div class="px-5 py-5 rounded-3xl bg-gradient-to-br from-slate-900 to-[#0A3D62] text-white">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 px-1">
+                <div>
+                    <div class="font-extrabold text-xl">Enterprise-grade additions in v3</div>
+                    <div class="text-sm opacity-90 mt-0.5">All included at no cost — powered by free tools (localStorage, IndexedDB, browser APIs).</div>
+                </div>
+                <div class="flex flex-wrap items-center gap-3 text-xs">
+                    <div class="flex items-center px-4 py-2 bg-white/10 rounded-3xl font-bold text-xs">
+                        <span>Advanced Analytics</span>
+                    </div>
+                    <div class="flex items-center px-4 py-2 bg-white/10 rounded-3xl font-bold text-xs">
+                        <span>Automated Reports</span>
+                    </div>
+                    <div class="flex items-center px-4 py-2 bg-white/10 rounded-3xl font-bold text-xs">
+                        <span>At-Risk Detection</span>
+                    </div>
+                    <div class="flex items-center px-4 py-2 bg-white/10 rounded-3xl font-bold text-xs">
+                        <span>Export Suite</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="max-w-screen-xl mx-auto px-6 pb-10 pt-2">
+        <div class="flex flex-col lg:flex-row gap-y-5 lg:items-center justify-between border-t border-slate-200 pt-8 text-xs">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-x-4 gap-y-2 text-slate-500">
+                <div>Built by <span class="font-extrabold text-slate-800">Adewale Samson Adeagbo</span> • HMG Concepts • Lagos, Nigeria</div>
+                <div class="flex items-center gap-x-1.5">
+                    <span class="px-1.5 py-px bg-slate-200 rounded text-slate-700 text-[10px]">100% free-tier tools</span>
+                    <span class="px-1.5 py-px bg-slate-200 rounded text-slate-700 text-[10px]">No AI APIs</span>
+                    <span class="px-1.5 py-px bg-slate-200 rounded text-slate-700 text-[10px]">Open source</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-x-4 text-xs">
+                <a href="https://github.com/hmgacademyhub" class="hover:text-[#0A3D62]">GitHub</a>
+                <a href="teach.html" class="hover:text-[#0A3D62]">Teacher Studio</a>
+                <a href="#features" class="hover:text-[#0A3D62]">Full Features</a>
+                <span class="px-3 py-1 bg-white border text-xs rounded-2xl">MIT License</span>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Tailwind script
+        function initializeTailwind() {
+            document.documentElement.style.setProperty('--accent', '#0A3D62');
+        }
+        
+        function showMobileMenu() {
+            const menu = document.createElement('div');
+            menu.className = `fixed inset-0 bg-black/50 z-[200] flex items-end`;
+            menu.innerHTML = `
+                <div class="w-full bg-white rounded-t-3xl p-5">
+                    <div class="flex justify-between mb-5 px-1">
+                        <span class="font-extrabold text-xl">HMG CLASS DECK</span>
+                        <button onclick="this.closest('.fixed').remove()" class="w-8 h-8 flex items-center justify-center text-xl">×</button>
+                    </div>
+                    
+                    <div class="flex flex-col">
+                        <a href="#features" class="py-[13px] px-1 flex items-center gap-x-3 text-base font-semibold border-b">Features</a>
+                        <a href="#enterprise" class="py-[13px] px-1 flex items-center gap-x-3 text-base font-semibold border-b">Enterprise</a>
+                        <a href="#comparison" class="py-[13px] px-1 flex items-center gap-x-3 text-base font-semibold border-b">Compare</a>
+                        <a href="teach.html" class="py-[13px] px-1 flex items-center gap-x-3 text-base font-semibold">Teacher Studio</a>
+                        <a href="cbt.html" class="py-[13px] px-1 flex items-center gap-x-3 text-base font-semibold">CBT Practice</a>
+                        <a href="community.html" class="py-[13px] px-1 flex items-center gap-x-3 text-base font-semibold">Community</a>
+                    </div>
+                    
+                    <div class="mt-4 pt-4 border-t">
+                        <a href="teach.html" class="flex items-center justify-center w-full py-3 rounded-3xl bg-[#0A3D62] text-white font-bold">Open Teacher Studio</a>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(menu);
+        }
+        
+        // Initialize everything
+        function init() {
+            initializeTailwind();
+            
+            // Demo stats animation
+            const stats = document.querySelectorAll('.stat-number');
+            stats.forEach(stat => {
+                const final = stat.textContent;
+                stat.textContent = '0';
+                
+                if (final.includes(',')) {
+                    let count = 0;
+                    const target = parseInt(final.replace(/,/g, ''));
+                    const inc = Math.ceil(target / 40);
+                    
+                    const timer = setInterval(() => {
+                        count += inc;
+                        if (count >= target) {
+                            stat.textContent = final;
+                            clearInterval(timer);
+                        } else {
+                            stat.textContent = Math.floor(count).toLocaleString();
+                        }
+                    }, 60);
+                }
+            });
+            
+            // Keyboard shortcut hint
+            console.log('%c[HMG ClassDeck] Enhanced v3 loaded. Press "?" for feature help.', 'color:#64748b');
+            
+            // Add some interactivity hint
+            setTimeout(() => {
+                const featureCards = document.querySelectorAll('.feature-card');
+                featureCards.forEach((card, i) => {
+                    card.addEventListener('click', () => {
+                        card.style.transform = 'scale(0.98)';
+                        setTimeout(() => {
+                            card.style.transform = 'scale(1)';
+                            if (i === 0) window.location.href = 'teach.html';
+                            else if (i === 3) window.location.href = 'cbt.html';
+                        }, 200);
+                    });
+                });
+            }, 1800);
+            
+            // Easter egg / keyboard shortcut
+            document.addEventListener('keydown', function(e) {
+                if (e.key === '?') {
+                    e.preventDefault();
+                    const modal = document.createElement('div');
+                    modal.className = 'fixed inset-0 z-[200] flex items-center justify-center bg-black/40';
+                    modal.innerHTML = `
+                        <div onclick="event.target.remove()" class="max-w-md w-full mx-4 bg-white rounded-3xl shadow-2xl p-6">
+                            <div class="font-extrabold text-xl mb-3 px-1">Quick Feature Reference</div>
+                            <div class="space-y-[1px] text-sm">
+                                <div class="flex justify-between px-1 py-[7px]"><span>Teacher Studio</span> <span class="font-mono text-xs bg-slate-100 px-2 rounded">T</span></div>
+                                <div class="flex justify-between px-1 py-[7px]"><span>Join Class</span> <span class="font-mono text-xs bg-slate-100 px-2 rounded">J</span></div>
+                                <div class="flex justify-between px-1 py-[7px]"><span>CBT Practice</span> <span class="font-mono text-xs bg-slate-100 px-2 rounded">C</span></div>
+                                <div class="flex justify-between px-1 py-[7px]"><span>Classroom Command</span> <span class="font-mono text-xs bg-slate-100 px-2 rounded">K</span></div>
+                            </div>
+                            <div class="pt-3 text-xs text-center text-slate-400">All pages are fully interactive and offline ready.</div>
+                        </div>
+                    `;
+                    document.body.appendChild(modal);
+                }
+                
+                if (e.key.toLowerCase() === 't' && document.activeElement.tagName === 'BODY') {
+                    window.location = 'teach.html';
+                }
+            });
+            
+            // Track visits
+            if (!localStorage.getItem('hmg_deck_visit')) {
+                localStorage.setItem('hmg_deck_visit', new Date().toISOString());
+            }
+        }
+        
+        window.onload = init;
+    </script>
+</body>
+</html>

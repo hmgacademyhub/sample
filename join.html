@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Class — HMG ACADEMY CLASS DECK v3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', system_ui, sans-serif; }
+        .hmg-logo { font-weight: 800; letter-spacing: -1.5px; }
+    </style>
+</head>
+<body class="bg-slate-100">
+    <div class="max-w-md mx-auto pt-6">
+        <div class="bg-white shadow-xl rounded-[3rem] p-1 mx-4">
+            <div class="px-5 pt-7 pb-6">
+                <!-- Header -->
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center">
+                        <div class="w-9 h-9 bg-[#0A3D62] flex items-center justify-center text-white rounded-2xl">
+                            <i class="fas fa-users text-xl"></i>
+                        </div>
+                        <div class="ml-3">
+                            <span class="font-extrabold text-3xl text-[#0A3D62]">HMG</span>
+                            <span class="font-bold text-xl">ClassDeck</span>
+                        </div>
+                    </div>
+                    <div class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-3xl text-xs font-extrabold px-3">v3.2</div>
+                </div>
+                
+                <div class="mt-5">
+                    <h1 class="text-3xl font-extrabold">Join your class</h1>
+                    <p class="text-slate-600 text-sm mt-1">No account needed. Works on any phone, tablet or laptop.</p>
+                </div>
+                
+                <div class="mt-6">
+                    <div class="text-xs font-bold px-1 mb-1">Room code</div>
+                    <input id="room-code" type="text" value="HMG-94KX2" class="w-full px-4 py-[9px] border rounded-[2rem] text-sm font-semibold">
+                    
+                    <div class="mt-3 text-xs font-bold px-1 mb-1">Your name</div>
+                    <input id="student-name" type="text" value="Chioma Eze" class="w-full px-4 py-[9px] border rounded-[2rem] text-sm font-semibold">
+                    
+                    <div class="mt-3 text-xs font-bold px-1 mb-1">Class PIN (if required)</div>
+                    <input id="class-pin" type="text" placeholder="Optional" class="w-full px-4 py-[9px] border rounded-[2rem] text-sm font-semibold">
+                    
+                    <button onclick="joinClass()" 
+                            class="mt-5 w-full py-3 flex items-center justify-center font-extrabold bg-[#0A3D62] text-white rounded-[3rem]">
+                        <span>Join class now</span>
+                    </button>
+                </div>
+                
+                <div class="mt-4 flex justify-center items-center gap-x-3 text-xs">
+                    <button onclick="scanQR()" class="flex items-center px-3 py-1.5 gap-x-1 text-xs font-bold bg-white border px-4 rounded-[2rem]">
+                        <i class="fas fa-qrcode"></i> <span>Scan QR</span>
+                    </button>
+                    <button onclick="manualJoin()" class="flex items-center px-3 py-1.5 gap-x-1 text-xs font-bold bg-white border px-4 rounded-[2rem]">
+                        <i class="fas fa-link"></i> <span>Manual join</span>
+                    </button>
+                </div>
+                
+                <div class="mt-5 pt-4 border-t">
+                    <div class="text-xs text-center">
+                        <span class="font-extrabold">Teacher must be LIVE</span> before you can join.
+                    </div>
+                    
+                    <div class="flex justify-center mt-2 text-xs">
+                        <div class="flex items-center gap-x-1 px-2">
+                            <div class="px-2 py-[1px] rounded-3xl bg-emerald-100 text-emerald-700 flex items-center text-xs px-3">
+                                <i class="fas fa-check mr-1"></i>
+                                <span class="font-bold">34 students already joined</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Student dashboard preview -->
+        <div class="px-4 mt-6">
+            <div class="text-xs font-bold px-1 mb-1">Once joined you will see:</div>
+            
+            <div class="grid grid-cols-2 gap-2 text-xs">
+                <div class="bg-white p-2.5 rounded-2xl border">
+                    <div class="flex items-center"><i class="fas fa-chalkboard text-emerald-600 mr-1"></i> <span class="font-bold">Live whiteboard</span></div>
+                    <div class="text-xs mt-0.5">See teacher annotations live</div>
+                </div>
+                <div class="bg-white p-2.5 rounded-2xl border">
+                    <div class="flex items-center"><i class="fas fa-tasks text-emerald-600 mr-1"></i> <span class="font-bold">Assignments</span></div>
+                    <div class="text-xs mt-0.5">Submit work instantly</div>
+                </div>
+                <div class="bg-white p-2.5 rounded-2xl border">
+                    <div class="flex items-center"><i class="fas fa-poll text-emerald-600 mr-1"></i> <span class="font-bold">Polls &amp; Quizzes</span></div>
+                    <div class="text-xs mt-0.5">Participate live</div>
+                </div>
+                <div class="bg-white p-2.5 rounded-2xl border">
+                    <div class="flex items-center"><i class="fas fa-microphone text-emerald-600 mr-1"></i> <span class="font-bold">Voice notes</span></div>
+                    <div class="text-xs mt-0.5">Record your answers</div>
+                </div>
+            </div>
+            
+            <div class="mt-3 px-1">
+                <div class="text-xs flex items-center justify-center">
+                    <div onclick="demoStudentJoin()" class="cursor-pointer px-3 py-[3px] flex items-center bg-white px-3 border rounded-[2rem] text-xs font-bold">
+                        <span>Demo join as student</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="max-w-md mx-auto px-4 mt-8 text-xs text-center text-slate-400">
+        Free for students • 100% offline capable • No personal data stored
+    </div>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        function joinClass() {
+            const code = document.getElementById('room-code').value || 'HMG-94KX2';
+            const name = document.getElementById('student-name').value || 'Student';
+            
+            localStorage.setItem('hmg_student_name', name);
+            localStorage.setItem('hmg_room_code', code);
+            localStorage.setItem('hmg_joined', 'true');
+            
+            // Simulate successful join
+            const btns = event.currentTarget;
+            document.body.innerHTML = `
+                <div class="max-w-md mx-auto pt-8 px-4">
+                    <div class="bg-white border rounded-[3rem] p-6 shadow">
+                        <div class="text-center">
+                            <i class="fas fa-check-circle text-emerald-600 fa-3x mb-2"></i>
+                            <div class="font-extrabold text-2xl">Joined successfully!</div>
+                            <div class="mt-1">Welcome, <span class="font-bold">${name}</span></div>
+                            
+                            <div class="mt-6 text-xs px-2">
+                                <div class="px-3 py-3 bg-emerald-50 rounded-2xl text-emerald-700">
+                                    <span class="font-extrabold">Class: JSS2 Maths • Room ${code}</span><br>
+                                    <span>Teacher: Adewale S. is LIVE</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6 grid grid-cols-2 gap-2 text-xs">
+                                <div onclick="goToStudentWorkspace()" class="bg-emerald-600 text-white font-extrabold py-3 rounded-[2rem] cursor-pointer">Open Workspace</div>
+                                <div onclick="goToStudentPortal()" class="border font-extrabold py-3 rounded-[2rem] cursor-pointer">View My Portfolio</div>
+                            </div>
+                            
+                            <div class="mt-5 text-[10px] text-emerald-700">Your camera &amp; mic will be activated only when the teacher requests.</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function scanQR() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center';
+            modal.innerHTML = `
+                <div class="bg-white rounded-3xl p-6 max-w-xs mx-4 text-center">
+                    <div class="font-extrabold">QR Scanner</div>
+                    <div class="mx-auto mt-4 w-40 h-40 border-4 border-dashed border-emerald-300 rounded-3xl flex items-center justify-center">
+                        <div class="text-center">
+                            <i class="fas fa-qrcode fa-3x text-emerald-300"></i>
+                            <div class="text-xs mt-2">Simulated QR scan</div>
+                        </div>
+                    </div>
+                    <div class="mt-5">
+                        <button onclick="simulateQRScan(this)" class="px-6 text-sm font-extrabold py-2 bg-emerald-600 text-white rounded-[3rem]">Scan now (demo)</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        function simulateQRScan(el) {
+            el.closest('.fixed').remove();
+            document.getElementById('room-code').value = 'HMG-94KX2';
+            setTimeout(() => {
+                alert('QR scanned successfully! Room code populated.');
+            }, 400);
+        }
+        
+        function manualJoin() {
+            const url = prompt('Paste the class offer URL or room code:', 'https://hmgacademyhub.github.io/classdeck/join.html?room=HMG-94KX2');
+            if (url) {
+                document.getElementById('room-code').value = url.includes('?room=') ? url.split('=')[1] : url;
+                setTimeout(() => {
+                    joinClass();
+                }, 400);
+            }
+        }
+        
+        function goToStudentWorkspace() {
+            // Redirect to a student view (simplified)
+            window.location.href = 'index.html#student-workspace';
+            // In production would open a live student view
+            alert('Student live workspace would open here. (In real app this would open a full live view with synced whiteboard, polls and submission tools.)');
+        }
+        
+        function goToStudentPortal() {
+            window.location.href = 'parent.html'; // Reuse parent for student view simulation
+        }
+        
+        function demoStudentJoin() {
+            localStorage.setItem('hmg_student_name', 'Demo Student');
+            localStorage.setItem('hmg_room_code', 'HMG-94KX2');
+            localStorage.setItem('hmg_joined', 'true');
+            window.location.href = 'index.html';
+        }
+        
+        // Keyboard support
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const room = document.getElementById('room-code');
+                if (room && document.activeElement === room) {
+                    joinClass();
+                }
+            }
+        });
+        
+        // Load saved data if present
+        window.onload = function() {
+            const savedName = localStorage.getItem('hmg_student_name');
+            if (savedName) {
+                const nameField = document.getElementById('student-name');
+                if (nameField) nameField.value = savedName;
+            }
+        }
+    </script>
+</body>
+</html>
