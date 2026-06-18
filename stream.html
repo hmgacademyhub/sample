@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Social Live Centre — HMG ACADEMY CLASS DECK</title>
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" href="assets/icon-96.png" />
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+<meta name="theme-color" content="#1e2a78" />
+<link rel="stylesheet" href="css/style.css" />
+<style>
+  body{background:linear-gradient(135deg,#10142b,#1e2a78);min-height:100vh;color:var(--text)}
+  .wrap{max-width:1180px;margin:0 auto;padding:18px;display:grid;gap:14px}
+  .hero{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:18px;box-shadow:0 18px 55px rgba(0,0,0,.25)}
+  .hero h1{margin:0 0 6px;font-size:clamp(24px,4vw,42px)}
+  .grid{display:grid;grid-template-columns:1.08fr .92fr;gap:14px}
+  .card{background:#fff;color:#10142b;border-radius:18px;padding:16px;box-shadow:0 12px 38px rgba(0,0,0,.22)}
+  .card h2,.card h3{margin:0 0 9px;color:#1e2a78}.card p,.card li{line-height:1.55}.muted{color:#576079}.tiny{font-size:12px}.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 9px;background:#eef1ff;color:#1e2a78;font-size:12px;font-weight:700;margin:2px}
+  .platforms{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.plat{border:1px solid #d8def7;border-radius:14px;padding:10px;background:#f8f9ff}.plat b{display:block;color:#1e2a78;margin-bottom:4px}
+  .preview{background:#050713;border-radius:16px;min-height:310px;display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid #2e3768}.preview video{width:100%;height:100%;object-fit:contain;background:#000}.steps{counter-reset:step}.steps li{margin-bottom:8px}.code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#10142b;color:#dfe6ff;border-radius:10px;padding:8px;word-break:break-all}.row2{display:flex;gap:8px;flex-wrap:wrap}.checklist label{display:flex;gap:8px;margin:6px 0;align-items:flex-start}.danger-note{border-left:4px solid #e02b2b;background:#fff1f1;padding:10px;border-radius:10px}.ok-note{border-left:4px solid #1d8f4f;background:#effaf3;padding:10px;border-radius:10px}textarea.input{min-height:80px}.footer{color:#dfe6ff;text-align:center;font-size:12px;padding:12px}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}.platforms{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <a class="brand" href="index.html" style="color:#fff;text-decoration:none"><img src="assets/icon-96.png" alt="" /> <span>HMG ACADEMY CLASS DECK</span></a>
+    <h1>📡 Social Live Centre</h1>
+    <p>Stream your live class to YouTube, Facebook, TikTok, Instagram and other platforms using <b>free browser + OBS workflows</b>. ClassDeck remains a free static app; your stream keys stay private in OBS or the social platform dashboard.</p>
+    <div>
+      <span class="pill">No AI API</span><span class="pill">No paid backend</span><span class="pill">OBS-friendly</span><span class="pill">RTMP checklist</span><span class="pill">Screen share preview</span>
+    </div>
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <h2>1. Choose your stream output</h2>
+      <p class="muted">Use the normal Teacher Studio for students. Use this centre to prepare the public/social broadcast.</p>
+      <div class="row2">
+        <button class="btn primary" id="openDeck">🧑‍🏫 Open Teacher Studio</button>
+        <button class="btn" id="openClean">🪟 Open clean OBS output</button>
+        <button class="btn" id="captureScreen">🖥 Test screen capture</button>
+        <button class="btn danger hide" id="stopCapture">Stop preview</button>
+      </div>
+      <p class="tiny muted">Clean output opens <code>teach.html?solo=1&amp;obs=1</code>. For the most reliable stream, capture the Teacher Studio window in OBS after tapping 🎯 Focus mode.</p>
+      <div class="preview" id="preview"><div style="color:#9aa3cf;text-align:center;padding:20px">Tap <b>Test screen capture</b> to confirm your browser can capture the ClassDeck/desktop window before you go live.</div></div>
+    </section>
+
+    <section class="card">
+      <h2>2. Platform RTMP checklist</h2>
+      <div class="platforms">
+        <div class="plat"><b>▶ YouTube Live</b><span class="tiny muted">RTMP server:</span><div class="code">rtmp://a.rtmp.youtube.com/live2</div><p class="tiny">Create a stream in YouTube Studio and copy your stream key into OBS.</p></div>
+        <div class="plat"><b>f Facebook Live</b><span class="tiny muted">RTMPS server:</span><div class="code">rtmps://live-api-s.facebook.com:443/rtmp/</div><p class="tiny">Use Facebook Live Producer; paste its key in OBS.</p></div>
+        <div class="plat"><b>🎵 TikTok Live</b><p class="tiny">TikTok must enable Live/RTMP access on the account. Copy the URL/key from TikTok Live Center or TikTok Studio.</p></div>
+        <div class="plat"><b>📸 Instagram Live</b><p class="tiny">Use Instagram Live Producer if your account has it. Instagram supplies a temporary RTMP URL and key.</p></div>
+      </div>
+      <div class="danger-note tiny"><b>Important limitation:</b> browsers cannot send RTMP directly to social media from a static GitHub Pages site. Use free OBS Studio or a free relay. Do not paste stream keys into ClassDeck.</div>
+    </section>
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <h2>3. OBS setup generator</h2>
+      <label>Class title</label><input class="input" id="title" placeholder="e.g. SS2 Mathematics — Simultaneous Equations" />
+      <label style="margin-top:8px">Teacher / brand</label><input class="input" id="brand" placeholder="e.g. HMG Academy" />
+      <label style="margin-top:8px">Destinations you will stream to</label>
+      <div class="checklist tiny">
+        <label><input type="checkbox" value="YouTube" /> YouTube Live</label>
+        <label><input type="checkbox" value="Facebook" /> Facebook Live</label>
+        <label><input type="checkbox" value="TikTok" /> TikTok Live</label>
+        <label><input type="checkbox" value="Instagram" /> Instagram Live Producer</label>
+        <label><input type="checkbox" value="Custom RTMP" /> Custom RTMP / school website</label>
+      </div>
+      <label style="margin-top:8px">Notes / stream description</label>
+      <textarea class="input" id="desc" placeholder="Objectives, hashtags, class rules, links..."></textarea>
+      <div class="row2" style="margin-top:10px"><button class="btn primary" id="downloadPlan">⬇ Download OBS plan</button><button class="btn" id="copyPlan">Copy plan</button><button class="btn" id="downloadIcs">📅 Download class calendar (.ics)</button></div>
+      <p class="tiny muted">The downloaded plan includes scene layout, audio settings, platform checklist, privacy checklist and troubleshooting notes.</p>
+    </section>
+
+    <section class="card">
+      <h2>4. Enterprise production checklist</h2>
+      <ol class="steps">
+        <li><b>Consent & privacy:</b> announce if the class will be public; hide minors' names/faces unless you have permission.</li>
+        <li><b>Bandwidth:</b> direct multistreaming needs upload bandwidth for every platform. A relay uses one upload but may limit free destinations.</li>
+        <li><b>Audio:</b> in OBS, set mic noise suppression/noise gate; test with a private/unlisted stream first.</li>
+        <li><b>Vertical platforms:</b> TikTok/Instagram prefer 9:16. Use a second OBS scene/canvas or crop the ClassDeck output.</li>
+        <li><b>Backup:</b> start ClassDeck local recording (⏺ Rec) so you still have a copy if a platform disconnects.</li>
+        <li><b>Engagement:</b> keep ClassDeck chat/polls/quiz for enrolled students; read selected questions aloud for the public audience.</li>
+      </ol>
+      <div class="ok-note tiny"><b>Recommended free stack:</b> ClassDeck → OBS Window Capture → one platform directly. For multistream: OBS Multiple RTMP Outputs plugin or a free relay account if available in your region.</div>
+    </section>
+  </div>
+  <div class="footer">Built for HMG ACADEMY · Stream keys stay outside ClassDeck · No paid AI/API dependency</div>
+</div>
+<script>
+"use strict";
+const $ = (s, r=document) => r.querySelector(s), $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+const qs = new URLSearchParams(location.search);
+const deckUrl = qs.get("deck") || location.href.replace(/stream\.html.*$/, "teach.html");
+const cleanUrl = qs.get("clean") || location.href.replace(/stream\.html.*$/, "teach.html?solo=1&obs=1");
+$("#openDeck").onclick = () => window.open(deckUrl, "_blank", "noopener");
+$("#openClean").onclick = () => window.open(cleanUrl, "_blank", "noopener");
+let capStream=null;
+$("#captureScreen").onclick = async () => {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) { alert("Screen capture is not supported in this browser. Try Chrome/Edge on desktop."); return; }
+  try {
+    capStream = await navigator.mediaDevices.getDisplayMedia({ video: { frameRate: { ideal: 15 } }, audio: true });
+    const v = document.createElement("video"); v.autoplay=true; v.muted=true; v.playsInline=true; v.srcObject=capStream;
+    $("#preview").innerHTML=""; $("#preview").appendChild(v);
+    $("#stopCapture").classList.remove("hide");
+    capStream.getVideoTracks()[0].addEventListener("ended", stopCap);
+  } catch(e) { alert("Could not start screen capture: " + e.message); }
+};
+function stopCap(){ if(capStream){ capStream.getTracks().forEach(t=>t.stop()); capStream=null; } $("#preview").innerHTML='<div style="color:#9aa3cf;text-align:center;padding:20px">Preview stopped.</div>'; $("#stopCapture").classList.add("hide"); }
+$("#stopCapture").onclick = stopCap;
+function planText(){
+  const title=$("#title").value.trim()||"Live Class"; const brand=$("#brand").value.trim()||"HMG Academy"; const desc=$("#desc").value.trim();
+  const dest=$$(".checklist input:checked").map(x=>x.value).join(", ")||"(choose in OBS/platform dashboard)";
+  return [
+    "HMG ACADEMY CLASS DECK — OBS SOCIAL LIVE PLAN",
+    "Generated: "+new Date().toLocaleString(), "",
+    "Class title: "+title, "Teacher/brand: "+brand, "Destinations: "+dest, "",
+    "Clean ClassDeck output URL:", cleanUrl, "",
+    "OBS SCENE:",
+    "1. Source: Window Capture → ClassDeck browser window (best).",
+    "2. Backup source: Browser Source → "+cleanUrl,
+    "3. Canvas: 1280x720 for regular platforms; create a separate 1080x1920 scene for TikTok/Instagram vertical.",
+    "4. Audio: microphone + optional desktop audio. Add noise suppression/noise gate.",
+    "5. Recording: Start OBS recording AND ClassDeck ⏺ Rec as backup.", "",
+    "RTMP SERVERS:",
+    "YouTube: rtmp://a.rtmp.youtube.com/live2",
+    "Facebook: rtmps://live-api-s.facebook.com:443/rtmp/",
+    "TikTok/Instagram: copy URL + key from each platform when eligible.", "",
+    "Description / notes:", desc || "-", "",
+    "PRIVACY CHECK:",
+    "[ ] Consent received for public streaming",
+    "[ ] Student names/faces hidden or approved",
+    "[ ] Stream key kept only in OBS/platform dashboard",
+    "[ ] Private/unlisted test completed before public stream"
+  ].join("\n");
+}
+function download(name, text, type){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type})); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1500); }
+$("#downloadPlan").onclick=()=>download("classdeck-obs-social-live-plan.txt",planText(),"text/plain");
+$("#copyPlan").onclick=async()=>{ try{ await navigator.clipboard.writeText(planText()); alert("Plan copied"); } catch{ alert(planText()); } };
+$("#downloadIcs").onclick=()=>{
+ const title=($("#title").value.trim()||"ClassDeck Live Class").replace(/\n/g," "); const now=new Date(), start=new Date(now.getTime()+3600000), end=new Date(start.getTime()+3600000);
+ const fmt=d=>d.toISOString().replace(/[-:]/g,"").replace(/\.\d{3}Z/,"Z");
+ const ics=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//HMG Academy//ClassDeck//EN","BEGIN:VEVENT","UID:"+Date.now()+"@hmg-classdeck","DTSTAMP:"+fmt(now),"DTSTART:"+fmt(start),"DTEND:"+fmt(end),"SUMMARY:"+title,"DESCRIPTION:"+planText().replace(/\n/g,"\\n").replace(/,/g,"\\,"),"END:VEVENT","END:VCALENDAR"].join("\r\n");
+ download("classdeck-live-class.ics",ics,"text/calendar");
+};
+</script>
+</body>
+</html>

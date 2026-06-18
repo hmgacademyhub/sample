@@ -1,1423 +1,934 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teacher Studio — HMG ACADEMY CLASS DECK v3</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
-        
-        body { font-family: 'Inter', system_ui, sans-serif; }
-        .heading-font { font-family: 'Space Grotesk', 'Inter', sans-serif; font-weight: 600; }
-        
-        .studio-header { background: linear-gradient(#0A3D62, #1E5F8A); }
-        
-        .panel {
-            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-            box-shadow: 0 10px 10px -3px rgb(15 23 42 / 0.1);
-        }
-        
-        .tool-btn {
-            transition: all .1s ease;
-        }
-        
-        .tool-btn:hover {
-            background-color: #f1e7ff;
-            transform: translateY(-1px);
-        }
-        
-        .whiteboard {
-            background: #f8fafc;
-            box-shadow: inset 0 1px 3px rgb(15 23 42 / 0.1);
-            cursor: crosshair;
-        }
-        
-        .nav-tab {
-            transition: all .1s ease;
-        }
-        
-        .nav-tab.active {
-            background-color: white;
-            box-shadow: 0 1px 3px rgb(15 23 42 / 0.1);
-            font-weight: 700;
-        }
-        
-        .side-panel {
-            box-shadow: 4px 0 15px -3px rgb(15 23 42 / 0.1);
-        }
-        
-        .classroom-controls {
-            background: #0f172a;
-        }
-        
-        .mini-student {
-            transition: all .1s ease;
-        }
-        
-        .feature-explain {
-            font-size: 0.72rem;
-            line-height: 1.25;
-        }
-        
-        .deck-panel {
-            border-radius: 0.85rem;
-        }
-        
-        .whiteboard-canvas {
-            border: 1px solid #64748b;
-            touch-action: none;
-        }
-        
-        .tool-active {
-            background-color: #0A3D62 !important;
-            color: white !important;
-            box-shadow: 0 0 0 3px #64748b30;
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Teacher Studio — HMG ACADEMY CLASS DECK</title>
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" href="assets/icon-96.png" />
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+<meta name="theme-color" content="#1e2a78" />
+<link rel="stylesheet" href="css/style.css" />
 </head>
-<body class="bg-slate-100">
-    <!-- Top Nav -->
-    <div class="bg-white border-b shadow-sm sticky top-0 z-50">
-        <div class="max-w-screen-2xl mx-auto px-5 py-3 flex items-center justify-between">
-            <div class="flex items-center gap-x-[10px]">
-                <div class="flex items-center">
-                    <div class="w-8 h-8 bg-[#0A3D62] flex items-center justify-center text-white rounded-2xl">
-                        <i class="fas fa-chalkboard-teacher"></i>
-                    </div>
-                    <div class="ml-3">
-                        <span class="font-extrabold text-2xl tracking-tighter text-[#0A3D62]">HMG</span>
-                        <span class="font-bold text-xl text-slate-700">ClassDeck</span>
-                    </div>
-                </div>
-                <div class="px-2.5 text-xs font-bold py-1 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center text-center">
-                    <span>v3.2 Enterprise</span>
-                </div>
-            </div>
-            
-            <div class="flex items-center gap-x-3">
-                <!-- Session Info -->
-                <div class="flex items-center text-sm px-4 bg-white border rounded-[2rem] py-[5px]">
-                    <div>
-                        <span class="font-bold">JSS2 Maths • SS3 Physics</span>
-                        <span class="block -mt-0.5 text-xs text-emerald-600 font-semibold">34 students connected</span>
-                    </div>
-                </div>
-                
-                <div class="flex items-center bg-emerald-100 rounded-[2rem] px-1 py-1">
-                    <div class="px-3 flex items-center">
-                        <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                        <span class="ml-2 font-extrabold text-emerald-700 text-xs">LIVE</span>
-                    </div>
-                    <button onclick="goLive()" 
-                            class="px-4 text-xs font-extrabold bg-emerald-600 hover:bg-emerald-700 transition-colors text-white rounded-[2rem] py-[6px] px-5 flex items-center text-center">
-                        <i class="fas fa-play mr-1.5 text-xs"></i> 
-                        <span id="live-btn">Go Live</span>
-                    </button>
-                </div>
-                
-                <div class="px-1 flex items-center gap-x-1 text-sm">
-                    <div onclick="showAnalytics()" class="cursor-pointer px-3 py-1 flex items-center text-xs font-extrabold rounded-[2rem] bg-slate-800 hover:bg-slate-900 text-white">
-                        <i class="fas fa-chart-bar mr-1"></i> 
-                        <span class="hidden md:inline">Analytics</span>
-                    </div>
-                    
-                    <div class="flex items-center gap-x-1">
-                        <button onclick="openLessonPlanner()" class="px-3 py-[5px] text-xs flex items-center gap-x-1 font-extrabold bg-white border px-2.5 text-slate-700 rounded-2xl hover:bg-slate-100">
-                            <i class="fas fa-book"></i> 
-                            <span class="hidden md:inline text-xs">Lesson Plan</span>
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="flex items-center">
-                    <div class="px-2.5 flex items-center text-xs rounded-[2rem] bg-white border py-1">
-                        <img src="https://picsum.photos/id/1012/24/24" class="w-5 h-5 rounded-full ring-1 ring-offset-1 ring-white object-cover" alt="">
-                        <span class="ml-2 text-xs font-extrabold">Adewale S.</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+<body>
+<div class="studio">
+
+  <!-- ============ TOP BAR ============ -->
+  <header class="topbar">
+    <a class="brand" href="index.html" title="Home">
+      <img src="assets/icon-96.png" alt="" /> <span>HMG&nbsp;ACADEMY&nbsp;CLASS&nbsp;DECK</span>
+    </a>
+
+    <span id="liveBadge" class="badge hide">● LIVE</span>
+    <span id="timerChip" class="badge"><span>⏱</span><b id="timerVal">00:00</b></span>
+
+    <div class="roominfo" id="roomInfo" title="Tap to copy student link">
+      Room <code id="roomCodeLbl">——</code>
+      <span class="dot off" id="sigDot"></span>
+      <span id="stuCount">0 👥</span>
+      <button class="btn small ghost" id="btnNewRoom" title="Generate a fresh room code (multi-teacher: every teacher/device gets their own room)">↺</button>
     </div>
-    
-    <div class="max-w-screen-2xl mx-auto">
-        <!-- Main Layout -->
-        <div class="flex h-[calc(100vh-60px)]">
-            
-            <!-- Sidebar Tools -->
-            <div class="w-14 bg-white border-r flex flex-col items-center py-3 gap-y-1">
-                <div onclick="switchPanel('whiteboard')" class="tool-btn w-9 h-9 flex items-center justify-center rounded-2xl bg-[#0A3D62] text-white cursor-pointer mb-1" title="Whiteboard">
-                    <i class="fas fa-pen fa-lg"></i>
-                </div>
-                <div onclick="switchPanel('pdf')" class="tool-btn w-9 h-9 flex items-center justify-center rounded-2xl hover:bg-slate-100 cursor-pointer text-slate-700" title="PDF">
-                    <i class="fas fa-file-pdf fa-lg"></i>
-                </div>
-                <div onclick="switchPanel('browser')" class="tool-btn w-9 h-9 flex items-center justify-center rounded-2xl hover:bg-slate-100 cursor-pointer text-slate-700" title="Browser">
-                    <i class="fas fa-globe fa-lg"></i>
-                </div>
-                <div onclick="switchPanel('notes')" class="tool-btn w-9 h-9 flex items-center justify-center rounded-2xl hover:bg-slate-100 cursor-pointer text-slate-700" title="Notes">
-                    <i class="fas fa-sticky-note fa-lg"></i>
-                </div>
-                <div onclick="switchPanel('graph')" class="tool-btn w-9 h-9 flex items-center justify-center rounded-2xl hover:bg-slate-100 cursor-pointer text-slate-700" title="Graph">
-                    <i class="fas fa-chart-line fa-lg"></i>
-                </div>
-                <div onclick="switchPanel('toolkit')" class="tool-btn w-9 h-9 flex items-center justify-center rounded-2xl hover:bg-slate-100 cursor-pointer text-slate-700" title="Toolkit">
-                    <i class="fas fa-tools fa-lg"></i>
-                </div>
-                <div onclick="switchPanel('cards')" class="tool-btn w-9 h-9 flex items-center justify-center rounded-2xl hover:bg-slate-100 cursor-pointer text-slate-700" title="Flashcards">
-                    <i class="fas fa-clone fa-lg"></i>
-                </div>
-                <div onclick="switchPanel('timer')" class="tool-btn w-9 h-9 flex items-center justify-center rounded-2xl hover:bg-slate-100 cursor-pointer text-slate-700" title="Timer">
-                    <i class="fas fa-clock fa-lg"></i>
-                </div>
-                
-                <div class="flex-1"></div>
-                
-                <div onclick="showAllTools()" class="text-xs flex items-center justify-center w-9 h-9 rounded-2xl hover:bg-slate-200 cursor-pointer text-slate-500">
-                    <i class="fas fa-ellipsis-h"></i>
-                </div>
-            </div>
-            
-            <!-- Main Workspace -->
-            <div class="flex-1 p-4 flex flex-col gap-y-2">
-                
-                <!-- Workspace Tabs -->
-                <div class="flex items-center justify-between mb-1">
-                    <div class="flex items-center bg-white rounded-[2rem] border p-1 shadow-sm">
-                        <div onclick="switchPanel('whiteboard')" class="nav-tab px-4 py-[6px] text-xs font-extrabold cursor-pointer active flex items-center gap-x-1 px-4 rounded-[2rem]" id="tab-whiteboard">
-                            <i class="fas fa-pen"></i> <span class="text-xs font-extrabold">Whiteboard</span>
-                        </div>
-                        <div onclick="switchPanel('pdf')" class="nav-tab px-4 py-[6px] text-xs font-extrabold cursor-pointer flex items-center gap-x-1 px-4 rounded-[2rem]" id="tab-pdf">
-                            <i class="fas fa-file-pdf"></i> <span class="text-xs font-extrabold">PDF</span>
-                        </div>
-                        <div onclick="switchPanel('browser')" class="nav-tab px-4 py-[6px] text-xs font-extrabold cursor-pointer flex items-center gap-x-1 px-4 rounded-[2rem]" id="tab-browser">
-                            <i class="fas fa-globe"></i> <span class="text-xs font-extrabold">Browser</span>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-center gap-x-2">
-                        <button onclick="toggleFocusMode()" class="px-3 py-1.5 flex text-xs items-center gap-x-1 bg-white text-slate-700 border rounded-2xl hover:bg-slate-50 px-3 font-extrabold">
-                            <i class="fas fa-expand"></i> 
-                            <span class="hidden md:inline text-xs">Focus Mode</span>
-                        </button>
-                        
-                        <button onclick="recordLesson()" class="px-4 py-1.5 flex items-center gap-x-2 text-xs bg-red-600 hover:bg-red-700 text-white font-extrabold rounded-2xl px-3">
-                            <i class="fas fa-video"></i> <span>Record</span>
-                        </button>
-                        
-                        <button onclick="exportCurrentPanel()" class="px-4 py-1.5 text-xs flex items-center gap-x-1 bg-white border rounded-2xl font-extrabold px-3">
-                            <i class="fas fa-download"></i> 
-                            <span class="hidden md:inline">Export</span>
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Workspace Panels Container -->
-                <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-2">
-                    
-                    <!-- Main Panel (Whiteboard / PDF / Browser) -->
-                    <div class="lg:col-span-7 bg-white border rounded-[2.25rem] flex flex-col overflow-hidden panel" id="main-panel">
-                        <!-- Whiteboard Panel -->
-                        <div id="panel-whiteboard" class="flex-1 flex flex-col">
-                            <div class="px-4 py-2.5 flex items-center justify-between bg-slate-50 border-b">
-                                <div class="flex items-center">
-                                    <span class="font-extrabold text-sm">Whiteboard</span>
-                                    <span class="px-2 text-[10px] font-bold ml-2 bg-emerald-100 text-emerald-700 rounded px-1.5 py-[1px]">LIVE</span>
-                                </div>
-                                
-                                <div class="flex items-center text-xs gap-x-[2px]">
-                                    <!-- Drawing Tools -->
-                                    <div class="flex items-center bg-white border rounded-[2rem] px-1 py-0.5">
-                                        <button onclick="setDrawTool('pen')" class="px-2.5 py-1 hover:bg-slate-100 text-xs font-bold rounded-[2rem] tool-btn" id="tool-pen"><i class="fas fa-pen"></i></button>
-                                        <button onclick="setDrawTool('highlighter')" class="px-2.5 py-1 hover:bg-slate-100 text-xs font-bold rounded-[2rem] tool-btn" id="tool-highlighter"><i class="fas fa-highlighter"></i></button>
-                                        <button onclick="setDrawTool('eraser')" class="px-2.5 py-1 hover:bg-slate-100 text-xs font-bold rounded-[2rem] tool-btn" id="tool-eraser"><i class="fas fa-eraser"></i></button>
-                                        <button onclick="setDrawTool('laser')" class="px-2.5 py-1 hover:bg-slate-100 text-xs font-bold rounded-[2rem] tool-btn" id="tool-laser"><i class="fas fa-dot-circle"></i></button>
-                                    </div>
-                                    
-                                    <div class="flex items-center bg-white border rounded-[2rem] px-1 py-[1px] ml-1">
-                                        <button onclick="undoWhiteboard()" class="px-2 py-1 text-xs"><i class="fas fa-undo"></i></button>
-                                        <button onclick="clearWhiteboard()" class="px-2 py-1 text-xs"><i class="fas fa-trash"></i></button>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="flex-1 p-2 bg-[#f8fafc]">
-                                <canvas id="whiteboard-canvas" width="700" height="470" class="whiteboard-canvas w-full h-full bg-white rounded-2xl shadow-inner" style="max-height: 470px;"></canvas>
-                            </div>
-                            
-                            <div class="px-4 py-[5px] flex items-center bg-white border-t justify-between text-xs">
-                                <div class="flex items-center gap-2">
-                                    <div class="flex items-center gap-1 px-1">
-                                        <div onclick="changeColor('#0A3D62')" class="w-3.5 h-3.5 bg-[#0A3D62] rounded-full cursor-pointer"></div>
-                                        <div onclick="changeColor('#e11d48')" class="w-3.5 h-3.5 bg-rose-600 rounded-full cursor-pointer"></div>
-                                        <div onclick="changeColor('#16a34a')" class="w-3.5 h-3.5 bg-emerald-600 rounded-full cursor-pointer"></div>
-                                        <div onclick="changeColor('#f59e0b')" class="w-3.5 h-3.5 bg-amber-500 rounded-full cursor-pointer"></div>
-                                    </div>
-                                    <div class="text-xs px-2 font-semibold">Page <span id="wb-page">1</span>/4</div>
-                                    <button onclick="addWhiteboardPage()" class="px-1.5 py-0 text-xs bg-white text-slate-700 border font-bold rounded px-2">+ Page</button>
-                                </div>
-                                <div>
-                                    <button onclick="saveWhiteboard()" class="text-xs px-3 py-1 font-extrabold flex items-center gap-1 bg-emerald-50 text-emerald-700 rounded-3xl px-2.5">
-                                        <i class="fas fa-save text-xs"></i> <span class="text-xs">Save</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- PDF Panel (Hidden by default) -->
-                        <div id="panel-pdf" class="hidden flex-1 flex flex-col">
-                            <div class="px-4 py-2 bg-slate-50 border-b flex items-center justify-between">
-                                <div class="flex items-center gap-x-2">
-                                    <span class="font-extrabold text-sm">PDF Reader</span>
-                                    <span class="px-2 py-px text-xs font-bold bg-orange-100 text-orange-700 rounded">NERDC</span>
-                                </div>
-                                <div class="flex items-center gap-x-1 text-xs">
-                                    <button onclick="openPDF()" class="px-3 text-xs font-extrabold flex items-center py-[4px] bg-white border rounded-[2rem] px-3">
-                                        <i class="fas fa-folder-open mr-1"></i> <span>Open PDF</span>
-                                    </button>
-                                    <button onclick="annotatePDF()" class="px-3 text-xs font-extrabold flex items-center py-[4px] bg-white border rounded-[2rem] px-3">
-                                        <i class="fas fa-edit mr-1"></i> <span>Annotate</span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="flex-1 flex items-center justify-center bg-slate-100 p-5">
-                                <div class="w-full max-w-sm border bg-white shadow-sm p-4 rounded-2xl">
-                                    <div class="flex items-center justify-between text-xs px-1">
-                                        <span class="font-extrabold">JSS2_Maths_Unit3.pdf</span>
-                                        <span class="px-1 text-emerald-600"><i class="fas fa-check-circle"></i></span>
-                                    </div>
-                                    <div class="h-64 bg-slate-100 mt-4 rounded-xl flex items-center justify-center text-center">
-                                        <div>
-                                            <i class="fas fa-file-pdf fa-3x text-orange-400"></i>
-                                            <div class="text-xs font-bold mt-2">PDF loaded locally.</div>
-                                            <div class="mt-1"><button onclick="simulatePDFAnnotation()" class="text-xs px-4 py-[1px] bg-orange-100 text-orange-700 font-extrabold rounded px-3">Annotate page</button></div>
-                                        </div>
-                                    </div>
-                                    <div class="px-1 flex justify-between items-center mt-3">
-                                        <div class="flex gap-2 text-xs"><span class="font-bold">Page 4/12</span></div>
-                                        <div class="flex text-xs items-center gap-1">
-                                            <button class="px-1"><i class="fas fa-chevron-left"></i></button>
-                                            <button class="px-1"><i class="fas fa-chevron-right"></i></button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Browser Panel -->
-                        <div id="panel-browser" class="hidden flex-1 flex flex-col">
-                            <div class="px-4 py-2 bg-slate-50 border-b flex items-center justify-between text-xs">
-                                <div class="flex items-center">
-                                    <span class="font-extrabold">Web Browser</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <input id="browser-url" type="text" value="https://www.khanacademy.org" class="px-2 py-[3px] text-xs border rounded-[2rem] px-3 w-56" placeholder="Enter URL">
-                                    <button onclick="loadBrowser()" class="ml-1 px-3 py-[4px] text-xs bg-emerald-600 text-white font-extrabold rounded-[2rem] px-4">Go</button>
-                                </div>
-                            </div>
-                            
-                            <div class="flex-1 bg-white p-3">
-                                <div class="border h-full rounded-2xl overflow-hidden">
-                                    <div class="bg-slate-50 px-3 py-2 flex text-xs items-center">
-                                        <span class="px-1.5 text-xs font-bold">Education Library</span>
-                                    </div>
-                                    <div id="browser-content" class="p-4 h-[350px] overflow-auto text-xs">
-                                        <div class="grid grid-cols-3 gap-3">
-                                            <div onclick="castToStudents('https://www.khanacademy.org')" class="cursor-pointer border p-2 rounded-xl hover:bg-emerald-50">
-                                                <div class="font-bold text-xs">Khan Academy</div>
-                                                <div class="text-xs text-emerald-600">Maths • Science</div>
-                                            </div>
-                                            <div onclick="castToStudents('https://phet.colorado.edu/')" class="cursor-pointer border p-2 rounded-xl hover:bg-emerald-50">
-                                                <div class="font-bold text-xs">PhET Simulations</div>
-                                                <div class="text-xs">Interactive Science</div>
-                                            </div>
-                                            <div onclick="castToStudents('https://www.bbc.co.uk/bitesize')" class="cursor-pointer border p-2 rounded-xl hover:bg-emerald-50">
-                                                <div class="font-bold text-xs">BBC Bitesize</div>
-                                                <div class="text-xs">All subjects</div>
-                                            </div>
-                                            <div onclick="castToStudents('https://www.desmos.com/calculator')" class="cursor-pointer border p-2 rounded-xl hover:bg-emerald-50">
-                                                <div class="font-bold text-xs">Desmos</div>
-                                                <div class="text-xs">Graphing</div>
-                                            </div>
-                                            <div onclick="castToStudents('https://ptable.com/')" class="cursor-pointer border p-2 rounded-xl hover:bg-emerald-50">
-                                                <div class="font-bold text-xs">Periodic Table</div>
-                                                <div class="text-xs">Chemistry</div>
-                                            </div>
-                                            <div onclick="castToStudents('https://waec.org.ng')" class="cursor-pointer border p-2 rounded-xl hover:bg-emerald-50">
-                                                <div class="font-bold text-xs">WAEC Portal</div>
-                                                <div class="text-xs">Nigerian curriculum</div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="mt-4 px-1">
-                                            <button onclick="castToStudents()" class="w-full text-xs py-[6px] flex items-center justify-center bg-emerald-600 text-white font-extrabold rounded-[2rem]">
-                                                <i class="fas fa-broadcast-tower mr-2"></i> <span>CAST TO STUDENTS</span>
-                                            </button>
-                                            <div class="text-[10px] text-center mt-1 text-slate-500">Streams clean reader view to all student devices</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Side Panel: Live Classroom + Tools -->
-                    <div class="lg:col-span-5 flex flex-col gap-y-2">
-                        
-                        <!-- Live Classroom Mini -->
-                        <div class="bg-white border rounded-[2.25rem] flex flex-col flex-1 overflow-hidden panel">
-                            <div class="px-3.5 py-[7px] flex items-center justify-between bg-slate-900 text-white text-xs">
-                                <div class="flex items-center gap-x-2 px-1">
-                                    <span class="font-extrabold">Live Classroom</span>
-                                    <span id="live-status" class="px-2 text-[10px] py-px rounded bg-emerald-500 text-white font-bold">34 ONLINE</span>
-                                </div>
-                                <button onclick="showClassroomCommand()" class="text-[10px] bg-white text-black font-extrabold px-3 py-[3px] rounded-[2rem]">Command Centre</button>
-                            </div>
-                            
-                            <div class="p-2 flex-1">
-                                <div class="text-xs font-bold px-2">Connected students</div>
-                                <div class="grid grid-cols-4 gap-1.5 mt-2 px-1">
-                                    <!-- Dynamic students populated by JS -->
-                                    <div class="mini-student px-1 py-1 rounded-xl bg-emerald-50 flex flex-col items-center text-center" id="student-1">
-                                        <div class="w-5 h-5 rounded-full bg-emerald-300 mb-px overflow-hidden"><img src="https://picsum.photos/id/1005/20/20" class="w-full"></div>
-                                        <div class="text-[9px] font-extrabold">Tunde</div>
-                                        <div class="text-emerald-500 text-[8px]">Hand raised</div>
-                                    </div>
-                                    <div class="mini-student px-1 py-1 rounded-xl bg-emerald-50 flex flex-col items-center text-center" id="student-2">
-                                        <div class="w-5 h-5 rounded-full bg-emerald-300 mb-px overflow-hidden"><img src="https://picsum.photos/id/1011/20/20" class="w-full"></div>
-                                        <div class="text-[9px] font-extrabold">Adaobi</div>
-                                    </div>
-                                    <div class="mini-student px-1 py-1 rounded-xl bg-emerald-50 flex flex-col items-center text-center" id="student-3">
-                                        <div class="w-5 h-5 rounded-full bg-emerald-300 mb-px overflow-hidden"><img src="https://picsum.photos/id/1009/20/20" class="w-full"></div>
-                                        <div class="text-[9px] font-extrabold">Chinedu</div>
-                                    </div>
-                                    <div class="mini-student px-1 py-1 rounded-xl bg-emerald-50 flex flex-col items-center text-center" id="student-4">
-                                        <div class="w-5 h-5 rounded-full bg-emerald-300 mb-px overflow-hidden"><img src="https://picsum.photos/id/201/20/20" class="w-full"></div>
-                                        <div class="text-[9px] font-extrabold">Amina</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="px-2 pt-3 flex items-center gap-x-2 text-xs">
-                                    <button onclick="sendPoll()" class="flex-1 bg-emerald-600 text-white rounded-[2rem] text-xs py-1 font-extrabold">Poll</button>
-                                    <button onclick="sendQuiz()" class="flex-1 bg-emerald-600 text-white rounded-[2rem] text-xs py-1 font-extrabold">Quiz</button>
-                                    <button onclick="raiseAllHands()" class="flex-1 px-3 bg-white border text-xs rounded-[2rem] py-1 font-extrabold">Hand Raise</button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Quick Toolkit -->
-                        <div class="bg-white border rounded-[2.25rem] p-2 flex-1 panel">
-                            <div class="px-3 py-1 flex justify-between">
-                                <span class="font-extrabold text-xs">Quick Toolkit</span>
-                                <span onclick="switchPanel('toolkit')" class="text-emerald-700 cursor-pointer text-xs font-extrabold">See all →</span>
-                            </div>
-                            
-                            <div class="grid grid-cols-4 gap-1 px-1 pt-2">
-                                <div onclick="launchTool('geometry')" class="text-center cursor-pointer text-xs p-1 rounded-xl hover:bg-slate-100">
-                                    <i class="fas fa-ruler-combined text-base mb-1"></i>
-                                    <div class="text-[9px]">Geometry</div>
-                                </div>
-                                <div onclick="launchTool('periodic')" class="text-center cursor-pointer text-xs p-1 rounded-xl hover:bg-slate-100">
-                                    <i class="fas fa-flask text-base mb-1"></i>
-                                    <div class="text-[9px]">Periodic</div>
-                                </div>
-                                <div onclick="launchTool('timer')" class="text-center cursor-pointer text-xs p-1 rounded-xl hover:bg-slate-100">
-                                    <i class="fas fa-stopwatch text-base mb-1"></i>
-                                    <div class="text-[9px]">Timer</div>
-                                </div>
-                                <div onclick="launchTool('noise')" class="text-center cursor-pointer text-xs p-1 rounded-xl hover:bg-slate-100">
-                                    <i class="fas fa-volume-up text-base mb-1"></i>
-                                    <div class="text-[9px]">Noise Meter</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                </div>
-                
-            </div>
-            
-            <!-- Right Sidebar: Assignments, Gradebook, Student Info -->
-            <div class="w-60 hidden xl:block bg-white border-l p-3">
-                <div class="px-1">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="font-extrabold text-xs">Gradebook</span>
-                        <button onclick="openGradebook()" class="text-xs text-emerald-600 font-bold">Full</button>
-                    </div>
-                    
-                    <div class="space-y-2 text-xs">
-                        <div class="flex justify-between px-2 py-1 bg-slate-50 rounded-xl items-center">
-                            <div class="flex items-center">
-                                <span class="font-bold">Quiz 3</span>
-                            </div>
-                            <div>
-                                <span class="px-1.5 text-xs font-extrabold bg-emerald-200 text-emerald-700 rounded px-2 py-[0.5px]">28/34</span>
-                            </div>
-                        </div>
-                        
-                        <div class="px-2">
-                            <div class="flex justify-between items-center text-xs">
-                                <div><span class="font-semibold">Average:</span> <span class="font-extrabold">74%</span></div>
-                            </div>
-                            <div class="mt-1 h-2 bg-emerald-100 rounded-full overflow-hidden">
-                                <div class="h-full bg-emerald-500 w-[74%]" style="width:74%"></div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-4">
-                        <div class="flex items-center justify-between mb-1 px-1">
-                            <span class="font-extrabold text-xs">Assignments (6)</span>
-                        </div>
-                        
-                        <div onclick="createAssignment()" class="cursor-pointer px-2 py-[6px] text-xs flex items-center gap-x-1 border bg-white rounded-xl">
-                            <i class="fas fa-plus text-emerald-600"></i>
-                            <span class="font-extrabold text-xs">Create Assignment</span>
-                        </div>
-                        
-                        <div class="mt-1 text-xs px-2 py-1 bg-white border rounded-xl">
-                            <div class="flex items-center justify-between">
-                                <span class="font-semibold">Essay: Climate Change</span>
-                            </div>
-                            <div class="flex text-xs items-center text-emerald-600">
-                                <span>18 submitted</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Badges -->
-                    <div class="mt-3 px-1">
-                        <div class="font-extrabold text-xs mb-1">Recent Badges</div>
-                        <div class="flex flex-wrap gap-x-[1px]">
-                            <div class="px-2 py-[1px] text-[10px] bg-amber-100 text-amber-700 rounded px-2 font-bold">Perfect Score</div>
-                            <div class="px-2 py-[1px] text-[10px] bg-emerald-100 text-emerald-700 rounded px-2 font-bold">Attendance</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-        </div>
+
+    <button class="btn small" id="btnQR" title="Show join QR / link">🔗 Invite</button>
+
+    <div class="spacer"></div>
+
+    <button class="btn small primary" id="btnGoLive">▶ Go Live</button>
+    <button class="btn small danger hide" id="btnEndLive">⏹ End</button>
+    <button class="btn small" id="btnCam" title="Toggle your camera">📷 Cam</button>
+    <button class="btn small" id="btnMic" title="Toggle your microphone">🎙 Mic</button>
+    <button class="btn small" id="btnRec" title="Record the lesson locally">⏺ Rec</button>
+
+    <button class="btn small" id="btnStudents" title="Students / monitoring">👥</button>
+    <button class="btn small" id="btnChat" title="Class chat">💬</button>
+    <button class="btn small" id="btnPoll" title="Quick poll">📊</button>
+    <button class="btn small" id="btnQuiz" title="Quiz with auto-scoring &amp; leaderboard">🏆</button>
+    <button class="btn small" id="btnBoards" title="Student whiteboards — every student gets a board only you can see">🎨</button>
+    <button class="btn small" id="btnActivity" title="Activities: open question, word cloud, exit ticket">🧩</button>
+    <button class="btn small" id="btnCalc" title="Floating calculator">🧮</button>
+    <button class="btn small" id="btnTimer" title="Countdown timer">⏱</button>
+
+    <button class="btn small" id="btnLayout" title="Cycle layout: split / left only / right only">◫</button>
+    <button class="btn small" id="btnSwap" title="Swap panes">⇄</button>
+    <button class="btn small" id="btnFocus" title="Focus mode — hide all bars (great while sharing on Google Meet)">🎯</button>
+    <button class="btn small" id="btnLessons" title="Lesson manager — save/load whiteboard decks">📚</button>
+    <button class="btn small" id="btnFull" title="Fullscreen">⛶</button>
+    <button class="btn small" id="btnSettings" title="Settings">⚙</button>
+  </header>
+
+  <!-- floating handle to exit focus mode -->
+  <button id="focusHandle" class="focus-handle hide" title="Show toolbar">☰</button>
+
+  <!-- v6: account badge (tap = logout) -->
+  <span id="authBadge" class="badge hide" style="position:fixed;bottom:8px;left:8px;z-index:400;font-size:10.5px;cursor:pointer"></span>
+
+  <!-- ============ SPLIT WORKSPACE ============ -->
+  <div class="workspace" id="workspace">
+
+    <!-- LEFT PANE -->
+    <div class="pane" id="paneLeft">
+      <div class="pane-head" data-pane="L">
+        <span class="tab active" data-app="board">✏ Whiteboard</span>
+        <span class="tab" data-app="pdf">📄 PDF</span>
+        <span class="tab" data-app="web">🌐 Browser</span>
+        <span class="tab" data-app="notes">🗒 Notes</span>
+        <span class="tab" data-app="image">🖼 Image</span>
+        <span class="tab" data-app="graph">📈 Graph</span>
+        <span class="tab" data-app="video">🎬 Video</span>
+        <span class="tab" data-app="toolkit">🧰 Toolkit</span>
+        <span class="tab" data-app="flash">🃏 Cards</span>
+        <span class="tab" data-app="stopwatch">⏱ Timer</span>
+      </div>
+      <div class="pane-body" id="bodyL"></div>
     </div>
-    
-    <!-- Bottom Bar -->
-    <div class="bg-white border-t px-5 py-1.5 flex items-center max-w-screen-2xl mx-auto">
-        <div class="flex items-center flex-1 gap-x-5 text-xs">
-            <div class="px-2">
-                <span class="font-extrabold">Room Code:</span> <span class="font-mono font-bold bg-slate-100 px-2 rounded">HMG-94KX2</span>
-            </div>
-            
-            <div class="flex items-center text-xs">
-                <span class="px-3 py-px bg-emerald-100 text-emerald-700 rounded px-2 font-extrabold">3-day trial active</span>
-            </div>
-        </div>
-        
-        <div class="flex items-center gap-x-3">
-            <button onclick="openParentMessaging()" class="px-4 text-xs font-extrabold py-1 bg-white border rounded-[2rem] px-3 flex items-center">
-                <i class="fas fa-comments mr-1"></i> <span class="text-xs">Message Parents</span>
-            </button>
-            
-            <button onclick="showCommunity()" class="px-3 py-1 text-xs font-extrabold rounded-[2rem] flex items-center gap-x-1 bg-white border px-4">
-                <i class="fas fa-users"></i> <span>Community</span>
-            </button>
-        </div>
+
+    <div class="divider" id="divider" title="Drag to resize"></div>
+
+    <!-- RIGHT PANE -->
+    <div class="pane" id="paneRight">
+      <div class="pane-head" data-pane="R">
+        <span class="tab" data-app="board">✏ Whiteboard</span>
+        <span class="tab active" data-app="pdf">📄 PDF</span>
+        <span class="tab" data-app="web">🌐 Browser</span>
+        <span class="tab" data-app="notes">🗒 Notes</span>
+        <span class="tab" data-app="image">🖼 Image</span>
+        <span class="tab" data-app="graph">📈 Graph</span>
+        <span class="tab" data-app="video">🎬 Video</span>
+        <span class="tab" data-app="toolkit">🧰 Toolkit</span>
+        <span class="tab" data-app="flash">🃏 Cards</span>
+        <span class="tab" data-app="stopwatch">⏱ Timer</span>
+      </div>
+      <div class="pane-body" id="bodyR"></div>
     </div>
-    
-    <!-- Modals -->
-    <!-- Poll Modal -->
-    <div id="poll-modal" onclick="if (event.target.id === 'poll-modal') hidePollModal()" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-        <div onclick="event.stopImmediatePropagation()" class="max-w-sm w-full bg-white rounded-3xl p-5 shadow-xl">
-            <div class="font-extrabold">Create Live Poll</div>
-            <div class="mt-4">
-                <label class="text-xs font-bold">Question</label>
-                <input id="poll-question" type="text" value="What is 12 × 8?" class="w-full border px-3 py-2 rounded-2xl text-sm">
-                
-                <div class="mt-3 text-xs font-bold">Options</div>
-                <div class="space-y-1">
-                    <input type="text" value="96" class="w-full px-3 py-1 text-xs border rounded-2xl">
-                    <input type="text" value="84" class="w-full px-3 py-1 text-xs border rounded-2xl">
-                    <input type="text" value="108" class="w-full px-3 py-1 text-xs border rounded-2xl">
-                    <input type="text" value="120" class="w-full px-3 py-1 text-xs border rounded-2xl">
-                </div>
-                
-                <div class="flex gap-2 mt-3">
-                    <button onclick="submitPoll()" class="flex-1 px-4 py-[7px] text-sm font-extrabold bg-emerald-600 text-white rounded-3xl">Send Poll</button>
-                    <button onclick="hidePollModal()" class="flex-1 px-4 py-[7px] text-sm font-extrabold bg-slate-100 text-slate-700 rounded-3xl">Cancel</button>
-                </div>
-            </div>
-        </div>
+  </div>
+
+  <!-- teacher self view -->
+  <div class="selfview" id="selfView"><video id="selfVideo" autoplay muted playsinline></video></div>
+</div>
+
+<!-- ============ APP TEMPLATES (cloned into panes) ============ -->
+<template id="tpl-board">
+  <section class="app-board active">
+    <div class="wb-toolbar">
+      <button class="tool active" data-tool="pen"      title="Pen">✏️</button>
+      <button class="tool" data-tool="highlight" title="Highlighter">🖍️</button>
+      <button class="tool" data-tool="eraser"    title="Eraser">🧽</button>
+      <button class="tool" data-tool="line"      title="Line">╱</button>
+      <button class="tool" data-tool="arrow"     title="Arrow">→</button>
+      <button class="tool" data-tool="rect"      title="Rectangle">▭</button>
+      <button class="tool" data-tool="ellipse"   title="Ellipse">◯</button>
+      <button class="tool" data-tool="triangle"  title="Triangle">△</button>
+      <button class="tool" data-tool="diamond"   title="Diamond">◇</button>
+      <button class="tool" data-tool="star"      title="Star">☆</button>
+      <button class="tool wb-fill" title="Fill shapes on/off">🪣</button>
+      <button class="tool" data-tool="text"      title="Text">T</button>
+      <button class="tool" data-tool="laser"     title="Laser pointer (fades, not saved)">🔴</button>
+      <span style="width:6px"></span>
+      <div class="wb-colors">
+        <span class="wb-color active" data-c="#111111" style="background:#111"></span>
+        <span class="wb-color" data-c="#e02b2b" style="background:#e02b2b"></span>
+        <span class="wb-color" data-c="#1565d8" style="background:#1565d8"></span>
+        <span class="wb-color" data-c="#0a8a3a" style="background:#0a8a3a"></span>
+        <span class="wb-color" data-c="#f59e0b" style="background:#f59e0b"></span>
+        <span class="wb-color" data-c="#8b5cf6" style="background:#8b5cf6"></span>
+      </div>
+      <input type="range" class="wb-size" min="1" max="14" value="3" title="Stroke size" style="width:80px" />
+      <span style="width:6px"></span>
+      <button class="tool wb-undo"  title="Undo">↩</button>
+      <button class="tool wb-redo"  title="Redo">↪</button>
+      <button class="tool wb-clear" title="Clear page">🗑</button>
+      <select class="input wb-bg" style="width:auto;padding:6px 8px" title="Background">
+        <option value="plain">Plain</option>
+        <option value="grid">Grid</option>
+        <option value="ruled">Ruled</option>
+        <option value="dark">Dark board</option>
+      </select>
+      <button class="tool wb-export" title="Export page as PNG">⬇</button>
+      <button class="tool wb-img" title="Insert image onto the board">🖼</button>
+      <input type="file" class="wb-imgfile hide" accept="image/*" />
+      <button class="tool wb-pdf" title="Export ALL pages as a PDF">🧾</button>
+      <button class="tool wb-penonly" title="Pen-only mode: stylus draws, finger pans (palm rejection)">✍</button>
+      <button class="tool wb-zoomreset" title="Reset zoom (pinch with 2 fingers to zoom this board only)">1:1</button>
+      <span class="wb-zoomlbl" style="font-size:11.5px;color:var(--text-dim);flex:0 0 auto">100%</span>
     </div>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        // Tailwind
-        function initTailwind() {
-            // already included
-        }
-        
-        let currentPanel = 'whiteboard';
-        let canvas, ctx;
-        let isDrawing = false;
-        let currentTool = 'pen';
-        let currentColor = '#0A3D62';
-        let currentLineWidth = 3;
-        let whiteboardPages = [];
-        let currentPage = 1;
-        
-        function switchPanel(panel) {
-            // Hide all panels
-            document.querySelectorAll('[id^="panel-"]').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('[id^="tab-"]').forEach(el => el.classList.remove('active'));
-            
-            // Show selected
-            document.getElementById('panel-' + panel).classList.remove('hidden');
-            const tab = document.getElementById('tab-' + panel);
-            if (tab) tab.classList.add('active');
-            
-            currentPanel = panel;
-            
-            // Special handling for whiteboard
-            if (panel === 'whiteboard') {
-                setTimeout(initWhiteboard, 100);
-            }
-        }
-        
-        function initWhiteboard() {
-            canvas = document.getElementById('whiteboard-canvas');
-            if (!canvas) return;
-            ctx = canvas.getContext('2d');
-            
-            ctx.strokeStyle = currentColor;
-            ctx.lineWidth = currentLineWidth;
-            ctx.lineJoin = 'round';
-            ctx.lineCap = 'round';
-            
-            // Restore if saved
-            if (!whiteboardPages[currentPage - 1]) {
-                whiteboardPages[currentPage - 1] = canvas.toDataURL();
-            }
-            
-            // Setup events
-            canvas.onmousedown = startDrawing;
-            canvas.onmousemove = draw;
-            canvas.onmouseup = stopDrawing;
-            canvas.onmouseout = stopDrawing;
-            
-            // Touch support
-            canvas.ontouchstart = startDrawingTouch;
-            canvas.ontouchmove = drawTouch;
-            canvas.ontouchend = stopDrawing;
-            
-            // Load previous if any
-            if (whiteboardPages[currentPage - 1] && whiteboardPages[currentPage - 1] !== canvas.toDataURL()) {
-                const img = new Image();
-                img.onload = function() {
-                    ctx.drawImage(img, 0, 0);
-                };
-                img.src = whiteboardPages[currentPage - 1];
-            }
-            
-            updatePageDisplay();
-        }
-        
-        function startDrawing(e) {
-            isDrawing = true;
-            ctx.beginPath();
-            ctx.moveTo(e.offsetX, e.offsetY);
-        }
-        
-        function draw(e) {
-            if (!isDrawing) return;
-            
-            ctx.strokeStyle = currentTool === 'highlighter' ? '#facc15aa' : currentColor;
-            ctx.lineWidth = currentTool === 'highlighter' ? 16 : (currentTool === 'eraser' ? 18 : currentLineWidth);
-            
-            if (currentTool === 'eraser') {
-                ctx.globalCompositeOperation = 'destination-out';
-            } else {
-                ctx.globalCompositeOperation = 'source-over';
-            }
-            
-            ctx.lineTo(e.offsetX, e.offsetY);
-            ctx.stroke();
-        }
-        
-        function stopDrawing() {
-            isDrawing = false;
-            ctx.closePath();
-            
-            // Save current state
-            if (canvas) {
-                whiteboardPages[currentPage - 1] = canvas.toDataURL();
-            }
-        }
-        
-        function startDrawingTouch(e) {
-            e.preventDefault();
-            const rect = canvas.getBoundingClientRect();
-            isDrawing = true;
-            ctx.beginPath();
-            ctx.moveTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
-        }
-        
-        function drawTouch(e) {
-            if (!isDrawing) return;
-            e.preventDefault();
-            const rect = canvas.getBoundingClientRect();
-            const x = e.touches[0].clientX - rect.left;
-            const y = e.touches[0].clientY - rect.top;
-            
-            ctx.strokeStyle = currentTool === 'highlighter' ? '#facc15aa' : currentColor;
-            ctx.lineWidth = currentTool === 'highlighter' ? 16 : (currentTool === 'eraser' ? 18 : currentLineWidth);
-            
-            if (currentTool === 'eraser') ctx.globalCompositeOperation = 'destination-out';
-            else ctx.globalCompositeOperation = 'source-over';
-            
-            ctx.lineTo(x, y);
-            ctx.stroke();
-        }
-        
-        function setDrawTool(tool) {
-            currentTool = tool;
-            
-            // Update active UI
-            document.querySelectorAll('[id^="tool-"]').forEach(el => el.classList.remove('tool-active'));
-            const active = document.getElementById('tool-' + tool);
-            if (active) active.classList.add('tool-active');
-            
-            if (tool === 'pen') {
-                currentLineWidth = 3;
-                currentColor = '#0A3D62';
-            } else if (tool === 'highlighter') {
-                currentLineWidth = 16;
-            } else if (tool === 'laser') {
-                currentLineWidth = 2;
-                currentColor = '#e11d48';
-            }
-        }
-        
-        function changeColor(color) {
-            currentColor = color;
-            if (ctx) ctx.strokeStyle = color;
-        }
-        
-        function clearWhiteboard() {
-            if (confirm('Clear this whiteboard page?')) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                whiteboardPages[currentPage - 1] = canvas.toDataURL();
-            }
-        }
-        
-        function undoWhiteboard() {
-            if (!canvas) return;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            // Simple undo: reload previous state (in a real app use history stack)
-            if (whiteboardPages[currentPage - 1]) {
-                const img = new Image();
-                img.onload = () => ctx.drawImage(img, 0, 0);
-                img.src = whiteboardPages[currentPage - 1];
-            }
-        }
-        
-        function addWhiteboardPage() {
-            if (canvas) {
-                whiteboardPages[currentPage - 1] = canvas.toDataURL();
-            }
-            
-            currentPage++;
-            if (!whiteboardPages[currentPage - 1]) whiteboardPages[currentPage - 1] = '';
-            
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            updatePageDisplay();
-        }
-        
-        function updatePageDisplay() {
-            const pageEl = document.getElementById('wb-page');
-            if (pageEl) pageEl.textContent = currentPage;
-        }
-        
-        function saveWhiteboard() {
-            if (!canvas) return;
-            const dataURL = canvas.toDataURL('image/png');
-            const link = document.createElement('a');
-            link.download = `whiteboard-page-${currentPage}.png`;
-            link.href = dataURL;
-            link.click();
-            
-            // Also store in localStorage for persistence
-            localStorage.setItem('hmg_whiteboard_' + currentPage, dataURL);
-            
-            // Toast
-            showToast('Whiteboard saved locally!');
-        }
-        
-        function openPDF() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.pdf';
-            input.onchange = function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    showToast('PDF loaded: ' + file.name + ' (local only)');
-                    // Simulate showing PDF in panel
-                    document.getElementById('panel-pdf').innerHTML = `
-                        <div class="px-4 py-2 bg-slate-50 border-b flex justify-between">
-                            <span class="font-extrabold">${file.name}</span>
-                            <span class="text-xs px-2 flex items-center font-bold bg-orange-100 text-orange-700 rounded">Local file</span>
-                        </div>
-                        <div class="p-5 flex-1 flex items-center justify-center bg-white">
-                            <div class="text-center">
-                                <i class="fas fa-file-pdf fa-5x text-orange-300"></i>
-                                <p class="mt-3 text-xs font-bold">PDF opened in browser.</p>
-                                <button onclick="simulatePDFAnnotation()" class="mt-4 text-xs px-4 py-1 bg-orange-500 text-white font-extrabold rounded-3xl px-4">Start annotating</button>
-                            </div>
-                        </div>
-                    `;
-                }
-            };
-            input.click();
-        }
-        
-        function annotatePDF() {
-            showToast('Annotation mode activated on PDF');
-            const pdfPanel = document.getElementById('panel-pdf');
-            pdfPanel.style.border = '2px solid #f59e0b';
-            setTimeout(() => {
-                pdfPanel.style.border = 'none';
-            }, 2200);
-        }
-        
-        function simulatePDFAnnotation() {
-            showToast('Annotation added to PDF page (simulated)');
-            const container = document.getElementById('panel-pdf');
-            if (container) {
-                container.innerHTML += `<div class="text-xs px-4 py-2 bg-amber-50 text-amber-700 font-bold">Annotation saved: "Important concept"</div>`;
-            }
-        }
-        
-        function loadBrowser() {
-            const urlInput = document.getElementById('browser-url').value.trim();
-            if (!urlInput) return;
-            
-            const container = document.getElementById('browser-content');
-            container.innerHTML = `
-                <div class="px-3 py-1 text-sm font-bold flex items-center">
-                    <span>Loaded: ${urlInput}</span>
-                </div>
-                <div class="p-4 bg-white rounded-xl mt-2 border">
-                    <div class="text-xs">Content loaded from: <span class="font-mono text-xs">${urlInput}</span></div>
-                    <div class="mt-3 text-xs bg-slate-50 p-2 rounded">This page simulates live streaming content to student devices via the Cast feature.</div>
-                    <div class="mt-2">
-                        <button onclick="castToStudents('${urlInput}')" class="px-4 py-1 bg-emerald-600 text-xs text-white font-extrabold rounded-2xl px-5">Cast this page</button>
-                    </div>
-                </div>
-            `;
-        }
-        
-        function castToStudents(url = null) {
-            const castUrl = url || 'https://www.khanacademy.org';
-            showToast(`Casting to all students: ${castUrl}`);
-            
-            // Simulate broadcast
-            setTimeout(() => {
-                const liveStatus = document.getElementById('live-status');
-                if (liveStatus) liveStatus.innerHTML = `<span class="px-2 text-emerald-500">CAST ACTIVE</span>`;
-            }, 1200);
-            
-            // Add to student notifications (sim)
-            localStorage.setItem('hmg_cast_url', castUrl);
-        }
-        
-        function launchTool(tool) {
-            const main = document.getElementById('main-panel');
-            
-            if (tool === 'geometry') {
-                main.innerHTML = `
-                    <div class="px-4 py-3 flex justify-between items-center bg-white border-b">
-                        <span class="font-extrabold">Geometry Construction</span>
-                        <button onclick="switchPanel('whiteboard')" class="px-3 py-px text-xs font-extrabold bg-white border px-4 rounded-3xl">Back</button>
-                    </div>
-                    <div class="p-5 text-xs flex flex-col justify-center h-full items-center">
-                        <div class="w-11/12">
-                            <div class="grid grid-cols-2 gap-3">
-                                <div class="px-3 py-4 border rounded-2xl text-center cursor-pointer hover:bg-emerald-50" onclick="alert('Drawing circle... (interactive tool)')">
-                                    <i class="fas fa-circle fa-2x mb-1 text-blue-500"></i>
-                                    <div class="font-bold">Circle</div>
-                                </div>
-                                <div class="px-3 py-4 border rounded-2xl text-center cursor-pointer hover:bg-emerald-50" onclick="alert('Drawing line segment')">
-                                    <i class="fas fa-ruler-horizontal fa-2x mb-1 text-blue-500"></i>
-                                    <div class="font-bold">Line</div>
-                                </div>
-                            </div>
-                            
-                            <div class="mt-4 px-3 text-center">
-                                <span class="text-xs font-extrabold">Interactive geometry tools for students to follow live.</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            } else if (tool === 'periodic') {
-                showToast('Periodic table loaded in toolkit mode.');
-                window.open('https://ptable.com/', '_blank');
-            } else if (tool === 'timer') {
-                switchPanel('timer');
-            } else if (tool === 'noise') {
-                showToast('Noise meter activated. Monitoring classroom volume...');
-                setTimeout(() => {
-                    showToast('Current noise: 42 dB (quiet)');
-                }, 1500);
-            }
-        }
-        
-        let isLive = false;
-        
-        function goLive() {
-            isLive = !isLive;
-            const btn = document.getElementById('live-btn');
-            const status = document.getElementById('live-status');
-            
-            if (isLive) {
-                btn.innerHTML = `<i class="fas fa-stop mr-1"></i> End Live`;
-                btn.classList.add('!bg-red-500');
-                btn.classList.remove('bg-emerald-600');
-                
-                if (status) status.innerHTML = 'LIVE';
-                
-                // Simulate live join
-                showToast('Class is now live! Students can join.');
-                
-                // Simulate students joining
-                setTimeout(() => {
-                    const studentsContainer = document.querySelector('.grid.grid-cols-4');
-                    if (studentsContainer) {
-                        studentsContainer.innerHTML += `
-                            <div class="mini-student px-1 py-1 rounded-xl bg-emerald-50 flex flex-col items-center text-center">
-                                <div class="w-5 h-5 rounded-full bg-emerald-300 mb-px overflow-hidden"><img src="https://picsum.photos/id/29/20/20" class="w-full"></div>
-                                <div class="text-[9px] font-extrabold">Ifeoluwa</div>
-                            </div>`;
-                    }
-                }, 3000);
-                
-                // Auto start analytics recording
-                localStorage.setItem('hmg_live_start', new Date().toISOString());
-            } else {
-                btn.innerHTML = `Go Live`;
-                btn.classList.remove('!bg-red-500');
-                btn.classList.add('bg-emerald-600');
-                if (status) status.innerHTML = `34 ONLINE`;
-                showToast('Session ended. Data saved.');
-            }
-        }
-        
-        function sendPoll() {
-            document.getElementById('poll-modal').classList.remove('hidden');
-            document.getElementById('poll-modal').classList.add('flex');
-        }
-        
-        function hidePollModal() {
-            document.getElementById('poll-modal').classList.add('hidden');
-            document.getElementById('poll-modal').classList.remove('flex');
-        }
-        
-        function submitPoll() {
-            const q = document.getElementById('poll-question').value;
-            hidePollModal();
-            
-            showToast('Poll sent to 34 students!');
-            
-            // Simulate results after 4 seconds
-            setTimeout(() => {
-                const resultsModal = document.createElement('div');
-                resultsModal.className = `fixed inset-0 bg-black/30 flex items-center justify-center z-[200]`;
-                resultsModal.innerHTML = `
-                    <div class="bg-white w-full max-w-sm mx-4 rounded-3xl p-4 shadow-xl">
-                        <div class="font-extrabold">Poll Results: ${q}</div>
-                        <div class="mt-3 space-y-2 text-xs">
-                            <div class="flex items-center"><div class="flex-1 bg-emerald-600 h-3 rounded" style="width:68%"></div> <span class="ml-2 w-8 font-extrabold">68%</span></div>
-                            <div class="flex items-center"><div class="flex-1 bg-emerald-400 h-3 rounded" style="width:15%"></div> <span class="ml-2 w-8 font-extrabold">15%</span></div>
-                            <div class="flex items-center"><div class="flex-1 bg-emerald-300 h-3 rounded" style="width:12%"></div> <span class="ml-2 w-8 font-extrabold">12%</span></div>
-                            <div class="flex items-center"><div class="flex-1 bg-emerald-200 h-3 rounded" style="width:5%"></div> <span class="ml-2 w-8 font-extrabold">5%</span></div>
-                        </div>
-                        <div class="mt-4 flex gap-2 text-xs">
-                            <button onclick="this.closest('.fixed').remove()" class="flex-1 py-[5px] bg-emerald-600 text-white text-xs font-extrabold rounded-3xl">Close</button>
-                            <button onclick="sendQuiz(); this.closest('.fixed').remove()" class="flex-1 py-[5px] text-xs bg-white border font-extrabold rounded-3xl">Launch quiz</button>
-                        </div>
-                    </div>
-                `;
-                document.body.appendChild(resultsModal);
-            }, 4800);
-        }
-        
-        function sendQuiz() {
-            showToast('Quiz launched! Results will appear in Analytics.');
-            
-            // Save to local for gradebook
-            const quizData = {
-                id: Date.now(),
-                name: 'Quick Quiz: Algebra',
-                total: 34,
-                completed: 24,
-                avg: 79
-            };
-            let quizzes = JSON.parse(localStorage.getItem('hmg_quizzes') || '[]');
-            quizzes.push(quizData);
-            localStorage.setItem('hmg_quizzes', JSON.stringify(quizzes));
-        }
-        
-        function updateStudentList() {
-            // Dynamic updates (simulated in live)
-            console.log('%c[ClassDeck] Student roster synced.', 'color:#64748b');
-        }
-        
-        function raiseAllHands() {
-            showToast('All hands raised!');
-            const students = document.querySelectorAll('.mini-student');
-            students.forEach(s => {
-                s.style.border = '2px solid #eab308';
-                setTimeout(() => s.style.border = 'none', 2800);
-            });
-        }
-        
-        function recordLesson() {
-            showToast('Recording started. Lesson will be saved to device.');
-            
-            const recBtn = event.currentTarget;
-            
-            setTimeout(() => {
-                const downloadBtn = document.createElement('div');
-                downloadBtn.className = 'fixed bottom-3 right-3 bg-red-600 text-white px-4 py-2 rounded-2xl flex items-center shadow text-xs font-extrabold';
-                downloadBtn.innerHTML = `<i class="fas fa-download mr-2"></i> Download recording (MP4)`;
-                downloadBtn.onclick = () => {
-                    showToast('Recording exported as MP4 (simulated, saved locally).');
-                    downloadBtn.remove();
-                };
-                document.body.appendChild(downloadBtn);
-            }, 14000);
-        }
-        
-        function showAnalytics() {
-            const modal = document.createElement('div');
-            modal.className = `fixed inset-0 bg-black/50 z-[200] flex items-center justify-center`;
-            modal.innerHTML = `
-                <div onclick="event.target.remove()" class="w-full max-w-2xl mx-3 bg-white rounded-3xl overflow-hidden">
-                    <div class="px-5 py-4 bg-slate-900 text-white flex justify-between items-center">
-                        <div class="font-extrabold">Analytics Dashboard</div>
-                        <button class="px-3 text-xs py-[4px] font-bold bg-white text-black px-2 rounded-[2rem]">Export PDF</button>
-                    </div>
-                    
-                    <div class="p-5">
-                        <div class="grid grid-cols-3 gap-3">
-                            <div class="p-3 rounded-2xl border">
-                                <div class="text-xs font-extrabold">Engagement</div>
-                                <div class="text-4xl font-extrabold mt-1">87%</div>
-                                <div class="flex items-center mt-1"><span class="text-xs text-emerald-600">↑ 12%</span> <span class="ml-auto text-xs">vs last class</span></div>
-                            </div>
-                            <div class="p-3 rounded-2xl border">
-                                <div class="text-xs font-extrabold">Avg. Score</div>
-                                <div class="text-4xl font-extrabold mt-1">76%</div>
-                                <div class="text-xs mt-1">24 students above 70%</div>
-                            </div>
-                            <div class="p-3 rounded-2xl border">
-                                <div class="text-xs font-extrabold">Participation</div>
-                                <div class="text-4xl font-extrabold mt-1">32/34</div>
-                                <div class="text-xs mt-1">Active today</div>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-5">
-                            <div class="font-extrabold text-xs mb-2">Top performers</div>
-                            <div class="space-y-2">
-                                <div class="flex justify-between items-center px-1"><span class="text-xs">Adaobi O.</span> <span class="text-xs font-bold">97%</span></div>
-                                <div class="flex justify-between items-center px-1"><span class="text-xs">Tunde A.</span> <span class="text-xs font-bold">92%</span></div>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-5 px-1">
-                            <div class="flex justify-between text-xs">
-                                <span class="font-extrabold">Badge leaders</span>
-                            </div>
-                            <div class="flex gap-1 mt-1">
-                                <div class="px-2 py-1 bg-amber-100 text-xs rounded-2xl px-3 font-bold">HMG Ambassador</div>
-                                <div class="px-2 py-1 bg-emerald-100 text-xs rounded-2xl px-3 font-bold">CBT Master</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="px-5 py-3 bg-slate-100 flex gap-2">
-                        <button onclick="exportAnalytics()" class="flex-1 text-xs font-extrabold py-2 bg-white border rounded-3xl">Download Report</button>
-                        <button onclick="this.closest('.fixed').remove()" class="flex-1 text-xs font-extrabold py-2 bg-white border rounded-3xl">Close</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-        
-        function exportAnalytics() {
-            showToast('Analytics report exported to CSV & PDF.');
-            const modal = event.target.closest('.fixed');
-            if (modal) modal.remove();
-        }
-        
-        function openGradebook() {
-            const modal = document.createElement('div');
-            modal.className = `fixed inset-0 z-[200] flex items-center justify-center bg-black/40`;
-            modal.innerHTML = `
-                <div class="max-w-4xl w-full mx-3 bg-white rounded-3xl p-5 shadow-2xl">
-                    <div class="flex items-center justify-between mb-3">
-                        <div>
-                            <span class="font-extrabold text-xl">Gradebook</span> 
-                            <span class="px-3 text-xs bg-emerald-100 text-emerald-700 font-bold rounded px-2.5">JSS2 Maths</span>
-                        </div>
-                        <div>
-                            <button onclick="exportGradebook()" class="px-4 py-1 text-xs font-extrabold bg-emerald-600 text-white rounded-3xl px-3">Export CSV</button>
-                            <button onclick="this.closest('.fixed').remove()" class="px-4 py-1 text-xs font-extrabold ml-1 px-3">Close</button>
-                        </div>
-                    </div>
-                    
-                    <div class="overflow-auto max-h-[300px]">
-                        <table class="w-full text-xs">
-                            <thead><tr class="border-b"><th class="text-left py-2 px-2 font-bold">Student</th><th class="px-3 text-center font-bold">Quiz 1</th><th class="px-3 text-center font-bold">Quiz 2</th><th class="px-3 text-center font-bold">Essay</th><th class="px-3 text-center font-bold">Final</th><th class="px-2 text-center font-bold">Badge</th></tr></thead>
-                            <tbody>
-                                <tr class="border-b"><td class="px-2 py-2">Tunde Adebayo</td><td class="text-center">90</td><td class="text-center">82</td><td class="text-center">78</td><td class="text-center font-bold">83</td><td class="px-1 text-center"><span class="text-amber-600">★</span></td></tr>
-                                <tr class="border-b"><td class="px-2 py-2">Adaobi Okoro</td><td class="text-center">95</td><td class="text-center">100</td><td class="text-center">88</td><td class="text-center font-bold">94</td><td class="px-1 text-center"><span class="text-amber-600">★</span></td></tr>
-                                <tr class="border-b"><td class="px-2 py-2">Chinedu Eze</td><td class="text-center">68</td><td class="text-center">72</td><td class="text-center">65</td><td class="text-center font-bold">68</td><td class="px-1 text-center"></td></tr>
-                                <tr><td class="px-2 py-2">Amina Yusuf</td><td class="text-center">85</td><td class="text-center">78</td><td class="text-center">92</td><td class="text-center font-bold">85</td><td class="px-1 text-center"><span class="text-amber-600">★</span></td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="mt-3 px-1 flex justify-between items-center text-xs">
-                        <div class="px-3">Rubric scoring: <span class="font-extrabold">4 criteria × 25 pts</span></div>
-                        <div><button onclick="applyRubric()" class="px-4 py-1 text-xs font-extrabold bg-white border rounded-3xl">Apply Rubric</button></div>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-        
-        function exportGradebook() {
-            showToast('Gradebook exported (CSV).');
-            const m = document.querySelector('.fixed');
-            if (m) m.remove();
-        }
-        
-        function applyRubric() {
-            showToast('Rubric applied to all submissions!');
-        }
-        
-        function createAssignment() {
-            const modal = document.createElement('div');
-            modal.className = `fixed inset-0 bg-black/50 z-[200] flex justify-center items-center`;
-            modal.innerHTML = `
-                <div class="max-w-md w-full mx-4 bg-white rounded-3xl p-5">
-                    <div class="font-extrabold mb-1">Create New Assignment</div>
-                    <input id="assign-title" type="text" value="Algebra: Linear Equations" class="border px-3 py-2 rounded-2xl w-full mb-3 text-sm">
-                    
-                    <div class="grid grid-cols-2 gap-2 text-xs mb-4">
-                        <div>
-                            <label class="font-bold text-xs">Due date</label>
-                            <input type="date" value="2026-06-25" class="border px-2 py-[5px] rounded-2xl w-full text-xs">
-                        </div>
-                        <div>
-                            <label class="font-bold text-xs">Max Points</label>
-                            <input type="number" value="50" class="border px-2 py-[5px] rounded-2xl w-full text-xs">
-                        </div>
-                    </div>
-                    
-                    <div class="flex gap-2">
-                        <button onclick="submitAssignment(this)" class="flex-1 text-sm py-[7px] font-extrabold bg-emerald-600 text-white rounded-3xl">Create &amp; Distribute</button>
-                        <button onclick="this.closest('.fixed').remove()" class="flex-1 text-sm py-[7px] font-extrabold bg-slate-100 text-slate-700 rounded-3xl">Cancel</button>
-                    </div>
-                    
-                    <div class="mt-2 text-xs px-1">Students will receive this in their join portal immediately.</div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-        
-        function submitAssignment(el) {
-            const title = document.getElementById('assign-title').value;
-            showToast(`Assignment "${title}" created & distributed.`);
-            el.closest('.fixed').remove();
-            
-            // Save for student view
-            let assignments = JSON.parse(localStorage.getItem('hmg_assignments') || '[]');
-            assignments.push({title: title, date: new Date().toISOString(), status: 'open'});
-            localStorage.setItem('hmg_assignments', JSON.stringify(assignments));
-        }
-        
-        function showClassroomCommand() {
-            window.location.href = 'classroom.html';
-        }
-        
-        function openParentMessaging() {
-            const modal = document.createElement('div');
-            modal.className = `fixed inset-0 flex items-center justify-center bg-black/40 z-[200]`;
-            modal.innerHTML = `
-                <div class="max-w-xs bg-white mx-3 w-full rounded-3xl p-4">
-                    <div class="font-extrabold">Parent Messaging (WhatsApp)</div>
-                    <div class="text-xs mt-2">Select students to message:</div>
-                    
-                    <div class="mt-2 space-y-1 text-xs">
-                        <div class="flex items-center"><input type="checkbox" checked> <span class="ml-2">Tunde's parent</span></div>
-                        <div class="flex items-center"><input type="checkbox" checked> <span class="ml-2">Adaobi's parent</span></div>
-                        <div class="flex items-center"><input type="checkbox"> <span class="ml-2">Chinedu's parent</span></div>
-                    </div>
-                    
-                    <textarea placeholder="Weekly progress update..." class="mt-3 w-full border px-3 py-2 text-xs rounded-2xl"></textarea>
-                    
-                    <div class="flex gap-2 mt-3">
-                        <button onclick="sendParentMsg(this)" class="flex-1 py-2 font-extrabold text-xs bg-emerald-700 text-white rounded-3xl">Send via WhatsApp</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-        
-        function sendParentMsg(el) {
-            showToast('Message sent to selected parents via WhatsApp link.');
-            el.closest('.fixed').remove();
-        }
-        
-        function openLessonPlanner() {
-            const modal = document.createElement('div');
-            modal.className = `fixed inset-0 z-[200] bg-black/40 flex items-center justify-center`;
-            modal.innerHTML = `
-                <div class="w-full max-w-lg mx-4 bg-white rounded-3xl p-5">
-                    <div class="font-extrabold text-xl mb-1">Lesson Planner (NERDC)</div>
-                    
-                    <div class="text-xs">
-                        <div class="mb-3">
-                            <label class="text-xs font-extrabold">Topic</label>
-                            <input type="text" class="px-3 py-[5px] w-full border rounded-2xl" value="Linear Equations &amp; Inequalities">
-                        </div>
-                        
-                        <div class="grid grid-cols-2 gap-x-3 mb-3">
-                            <div>
-                                <label class="text-xs font-extrabold">Class</label>
-                                <select class="w-full border px-2 py-[5px] rounded-2xl text-xs"><option>JSS2</option><option>SS2</option></select>
-                            </div>
-                            <div>
-                                <label class="text-xs font-extrabold">Duration</label>
-                                <input type="text" value="45 mins" class="w-full border px-2 py-[5px] rounded-2xl text-xs">
-                            </div>
-                        </div>
-                        
-                        <div class="px-2 py-2">
-                            <div class="font-extrabold text-xs">Learning Objectives</div>
-                            <ul class="mt-1 text-xs list-disc px-2">
-                                <li>Solve linear equations</li>
-                                <li>Apply inequalities in real life</li>
-                            </ul>
-                        </div>
-                        
-                        <div class="px-1 mt-3">
-                            <button onclick="saveLessonPlan(this)" class="w-full py-[8px] px-4 bg-emerald-600 text-white text-sm font-extrabold rounded-3xl">Save Lesson Plan + Distribute</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-        
-        function saveLessonPlan(el) {
-            showToast('Lesson plan saved and synced to students + community.');
-            el.closest('.fixed').remove();
-        }
-        
-        function showAllTools() {
-            const modal = document.createElement('div');
-            modal.className = `fixed inset-0 z-[200] flex items-center justify-center bg-black/40`;
-            modal.innerHTML = `
-                <div class="max-w-lg mx-3 w-full bg-white rounded-3xl p-4">
-                    <div class="px-2 py-1 flex justify-between items-center">
-                        <span class="font-extrabold">All 200+ Tools</span>
-                        <button onclick="this.closest('.fixed').remove()" class="font-bold">×</button>
-                    </div>
-                    
-                    <div class="grid grid-cols-4 gap-2 mt-3 text-xs">
-                        <div class="px-2 py-2 border rounded-2xl text-center"><i class="fas fa-ruler-combined"></i><div class="font-bold">Geometry</div></div>
-                        <div class="px-2 py-2 border rounded-2xl text-center"><i class="fas fa-flask"></i><div class="font-bold">Periodic</div></div>
-                        <div class="px-2 py-2 border rounded-2xl text-center"><i class="fas fa-clock"></i><div class="font-bold">Timer</div></div>
-                        <div class="px-2 py-2 border rounded-2xl text-center"><i class="fas fa-calculator"></i><div class="font-bold">Calculator</div></div>
-                        <div class="px-2 py-2 border rounded-2xl text-center"><i class="fas fa-globe"></i><div class="font-bold">Maps</div></div>
-                        <div class="px-2 py-2 border rounded-2xl text-center"><i class="fas fa-microscope"></i><div class="font-bold">Lab</div></div>
-                        <div class="px-2 py-2 border rounded-2xl text-center"><i class="fas fa-book"></i><div class="font-bold">Library</div></div>
-                        <div class="px-2 py-2 border rounded-2xl text-center"><i class="fas fa-dice"></i><div class="font-bold">Random</div></div>
-                    </div>
-                    
-                    <div class="mt-4 text-xs text-center text-emerald-700 font-extrabold">All tools are offline capable and work side-by-side.</div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-        
-        function showToast(msg) {
-            const toast = document.createElement('div');
-            toast.className = `fixed bottom-4 right-4 bg-slate-900 px-5 py-2.5 text-white shadow-xl text-xs font-extrabold rounded-[2rem] flex items-center`;
-            toast.innerHTML = `<span>${msg}</span>`;
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.style.transitionDuration = '150ms';
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 150);
-            }, 2500);
-        }
-        
-        function updateLiveStudents() {
-            // Periodically update connected students count
-            setInterval(() => {
-                const liveEl = document.getElementById('live-status');
-                if (liveEl && isLive) {
-                    const rand = Math.floor(Math.random() * 4) + 34;
-                    liveEl.innerHTML = rand + ' ONLINE';
-                }
-            }, 26000);
-        }
-        
-        function exportCurrentPanel() {
-            if (currentPanel === 'whiteboard' && canvas) {
-                const link = document.createElement('a');
-                link.download = 'whiteboard-export.png';
-                link.href = canvas.toDataURL();
-                link.click();
-            } else {
-                showToast('Panel exported as PDF (simulated).');
-            }
-        }
-        
-        function toggleFocusMode() {
-            const workspace = document.querySelector('.max-w-screen-2xl');
-            if (workspace.classList.contains('!max-w-full')) {
-                workspace.classList.remove('!max-w-full');
-                workspace.style.padding = '';
-            } else {
-                workspace.style.padding = '0';
-                workspace.classList.add('!max-w-full');
-            }
-            
-            showToast('Focus mode toggled.');
-        }
-        
-        function showCommunity() {
-            window.location.href = 'community.html';
-        }
-        
-        function initializeWhiteboardDefaults() {
-            // Preload canvas on load
-            setTimeout(() => {
-                const wbPanel = document.getElementById('panel-whiteboard');
-                if (wbPanel && !wbPanel.classList.contains('hidden')) {
-                    initWhiteboard();
-                    
-                    // Pre-draw something for demo
-                    setTimeout(() => {
-                        if (ctx) {
-                            ctx.strokeStyle = '#0A3D62';
-                            ctx.lineWidth = 3;
-                            ctx.beginPath();
-                            ctx.moveTo(120, 100);
-                            ctx.quadraticCurveTo(200, 70, 340, 120);
-                            ctx.stroke();
-                            
-                            ctx.beginPath();
-                            ctx.moveTo(150, 180);
-                            ctx.lineTo(400, 180);
-                            ctx.stroke();
-                            
-                            ctx.font = 'bold 13px Inter';
-                            ctx.fillStyle = '#0A3D62';
-                            ctx.fillText('Example equation: y = 2x + 3', 140, 230);
-                        }
-                    }, 800);
-                }
-            }, 1200);
-        }
-        
-        function initTooltips() {
-            // Add some interactive hints
-            console.log('%c[HMG] Teacher Studio fully loaded. All enterprise tools active.', 'font-size:9px;color:#64748b');
-        }
-        
-        function loadPersistedData() {
-            // Load saved whiteboard pages
-            for (let i = 1; i <= 4; i++) {
-                const saved = localStorage.getItem('hmg_whiteboard_' + i);
-                if (saved) {
-                    whiteboardPages[i - 1] = saved;
-                }
-            }
-            
-            // Load any previous live state
-            if (localStorage.getItem('hmg_live_start')) {
-                console.log('Previous session data loaded.');
-            }
-        }
-        
-        function init() {
-            initTailwind();
-            
-            // Default panel
-            switchPanel('whiteboard');
-            
-            // Load persisted
-            loadPersistedData();
-            
-            // Init canvas
-            initializeWhiteboardDefaults();
-            
-            // Live students update
-            updateLiveStudents();
-            
-            // Keyboard shortcuts
-            document.addEventListener('keydown', (e) => {
-                if (e.key === '/' && document.activeElement.tagName === 'BODY') {
-                    e.preventDefault();
-                    switchPanel('browser');
-                }
-                if (e.metaKey && e.key === 'l') {
-                    e.preventDefault();
-                    goLive();
-                }
-            });
-            
-            initTooltips();
-            
-            // Seed sample assignments if none
-            if (!localStorage.getItem('hmg_assignments')) {
-                localStorage.setItem('hmg_assignments', JSON.stringify([
-                    {title: 'Linear Equations Worksheet', date: '2026-06-17', status: 'open'}
-                ]));
-            }
-            
-            // Welcome toast on first load
-            if (!localStorage.getItem('hmg_teach_welcome')) {
-                setTimeout(() => {
-                    showToast('Welcome to ClassDeck v3! All features enhanced.');
-                    localStorage.setItem('hmg_teach_welcome', '1');
-                }, 3600);
-            }
-            
-            // Demo: simulate one student hand raise
-            setTimeout(() => {
-                const student = document.getElementById('student-1');
-                if (student) {
-                    student.style.boxShadow = '0 0 0 3px #eab308';
-                    setTimeout(() => {
-                        if (student) student.style.boxShadow = '';
-                    }, 4000);
-                }
-            }, 6500);
-            
-            console.log('%c[HMG ClassDeck v3] Teacher Studio initialized. 100% free, offline-first.', 'color:#0A3D62');
-        }
-        
-        window.onload = init;
-        
-        // Make available globally
-        window.switchPanel = switchPanel;
-        window.goLive = goLive;
-    </script>
+    <div class="wb-stage"></div>
+    <div class="wb-pagebar">
+      <button class="wb-prev" title="Previous page">‹</button>
+      <span class="wb-pageinfo">1 / 1</span>
+      <button class="wb-next" title="Next page">›</button>
+      <button class="wb-add"  title="New page">＋</button>
+      <button class="wb-del"  title="Delete page">✕</button>
+    </div>
+  </section>
+</template>
+
+<template id="tpl-pdf">
+  <section class="app-pdf active">
+    <div class="pdf-bar">
+      <button class="btn small pdf-open">📂 Open PDF</button>
+      <input type="file" class="pdf-file hide" accept="application/pdf" />
+      <button class="btn small pdf-prev">‹</button>
+      <span class="pdf-info" style="font-size:13px">– / –</span>
+      <button class="btn small pdf-next">›</button>
+      <button class="btn small pdf-zoomout">−</button>
+      <span class="pdf-zoom" style="font-size:13px">100%</span>
+      <button class="btn small pdf-zoomin">＋</button>
+      <button class="btn small pdf-fit">Fit</button>
+      <input type="number" class="input pdf-goto" placeholder="pg" style="width:64px;padding:5px 8px" min="1" />
+      <button class="btn small pdf-annot" title="Draw on top of this PDF page">✏ Annotate</button>
+      <button class="btn small pdf-annot-clear hide" title="Clear annotations on this page">🧹</button>
+    </div>
+    <div class="pdf-scroll">
+      <div class="pdf-pagewrap" style="position:relative;margin:14px">
+        <canvas class="pdf-canvas" style="margin:0"></canvas>
+        <div class="pdf-annot-stage" style="position:absolute;inset:0;display:none"></div>
+      </div>
+    </div>
+    <div class="drop-hint pdf-hint">
+      <div class="em">📄</div>
+      <b>Open a PDF</b>
+      <span>Tap “Open PDF”, or drop a file here.<br/>Your file stays on this device — nothing is uploaded.</span>
+    </div>
+  </section>
+</template>
+
+<template id="tpl-web">
+  <section class="app-web active">
+    <div class="web-bar">
+      <button class="btn small web-back">‹</button>
+      <button class="btn small web-reload">⟳</button>
+      <input type="text" class="input web-url" placeholder="Type a URL, e.g. en.wikipedia.org" />
+      <button class="btn small primary web-go">Go</button>
+      <button class="btn small web-pop" title="Open in a real browser tab">↗</button>
+      <button class="btn small ok web-cast" title="Cast this page to your students — works on every device">📡 Cast</button>
+      <span class="web-readerbar hide" style="display:flex;gap:4px;align-items:center">
+        <button class="btn small web-fontdn" title="Smaller text">A−</button>
+        <button class="btn small web-fontup" title="Bigger text">A＋</button>
+        <select class="input web-theme" style="width:auto;padding:5px" title="Reading theme">
+          <option value="light">⬜ Light</option>
+          <option value="sepia">📜 Sepia</option>
+          <option value="dark">⬛ Dark</option>
+          <option value="board">🟩 Board</option>
+        </select>
+        <button class="btn small web-livecast hide" title="True live screen capture (desktop browsers only)">🎥 Live</button>
+      </span>
+    </div>
+    <div class="quick-links">
+      <select class="input web-linklib" style="width:auto;max-width:46%;padding:6px 8px" title="Curated education library — Nursery to Senior Secondary">
+        <option value="">📚 Education library…</option>
+        <optgroup label="🧸 Nursery / Early years">
+          <option value="https://storyweaver.org.in">StoryWeaver — free picture story books</option>
+          <option value="https://www.storyberries.com">Storyberries — bedtime stories & poems</option>
+          <option value="https://en.wikibooks.org/wiki/Wikijunior">Wikijunior — books for young children</option>
+          <option value="https://www.monkeypen.com/pages/free-childrens-books">Monkey Pen — free children's books</option>
+          <option value="https://supersimple.com/super-simple-songs/">Super Simple Songs — rhymes & songs</option>
+        </optgroup>
+        <optgroup label="🎒 Primary">
+          <option value="https://simple.wikipedia.org">Simple English Wikipedia</option>
+          <option value="https://kids.nationalgeographic.com">Nat Geo Kids — animals & science</option>
+          <option value="https://www.coolmath4kids.com">CoolMath4Kids — games & lessons</option>
+          <option value="https://www.ducksters.com">Ducksters — history, science, biography</option>
+          <option value="https://www.funbrain.com">Funbrain — reading & maths games</option>
+          <option value="https://www.nasa.gov/learning-resources/nasa-kids-club/">NASA Kids Club</option>
+        </optgroup>
+        <optgroup label="📐 Mathematics">
+          <option value="https://www.desmos.com/calculator">Desmos graphing calculator</option>
+          <option value="https://www.geogebra.org/calculator">GeoGebra — graphing & geometry</option>
+          <option value="https://www.mathsisfun.com">Maths Is Fun — clear explanations</option>
+          <option value="https://www.transum.org">Transum — starters & puzzles</option>
+          <option value="https://nrich.maths.org">NRICH — rich maths problems</option>
+          <option value="https://www.openmiddle.com">Open Middle — challenge problems</option>
+        </optgroup>
+        <optgroup label="🔬 Science">
+          <option value="https://phet.colorado.edu/en/simulations/browse">PhET — interactive simulations</option>
+          <option value="https://ptable.com">Ptable — live periodic table</option>
+          <option value="https://www.bbc.co.uk/bitesize">BBC Bitesize — all subjects</option>
+          <option value="https://www.ck12.org">CK-12 — free STEM textbooks</option>
+          <option value="https://solarsystem.nasa.gov">NASA Solar System</option>
+          <option value="https://www.biologycorner.com">Biology Corner — worksheets</option>
+        </optgroup>
+        <optgroup label="📖 English & Literature">
+          <option value="https://www.gutenberg.org">Project Gutenberg — 70k free books</option>
+          <option value="https://en.wiktionary.org">Wiktionary — dictionary</option>
+          <option value="https://www.poetryfoundation.org">Poetry Foundation</option>
+          <option value="https://openlibrary.org">Open Library — borrow books</option>
+          <option value="https://www.grammarly.com/blog/category/handbook/">Grammar handbook</option>
+        </optgroup>
+        <optgroup label="🌍 Social Studies & ICT">
+          <option value="https://www.britannica.com">Encyclopaedia Britannica</option>
+          <option value="https://en.wikipedia.org/wiki/Nigeria">Wikipedia — Nigeria</option>
+          <option value="https://www.worldometers.info">Worldometers — live world data</option>
+          <option value="https://code.org">Code.org — learn coding</option>
+          <option value="https://scratch.mit.edu">Scratch — block programming</option>
+        </optgroup>
+        <optgroup label="🎓 Exams (Nigeria) & Open courses">
+          <option value="https://www.waeconline.org.ng">WAEC e-Learning portal</option>
+          <option value="https://www.jamb.gov.ng">JAMB official</option>
+          <option value="https://myschool.ng/classroom">Myschool — past questions</option>
+          <option value="https://www.khanacademy.org">Khan Academy — full courses</option>
+          <option value="https://openstax.org/subjects">OpenStax — free textbooks</option>
+          <option value="https://archive.org">Internet Archive</option>
+        </optgroup>
+      </select>
+      <button class="btn small ghost web-quick" data-u="https://simple.wikipedia.org">Simple Wiki</button>
+      <button class="btn small ghost web-quick" data-u="https://www.desmos.com/calculator">Desmos</button>
+      <button class="btn small ghost web-quick" data-u="https://phet.colorado.edu/en/simulations/browse">PhET</button>
+      <button class="btn small ghost web-quick" data-u="https://www.khanacademy.org">Khan</button>
+    </div>
+    <iframe class="web-frame" id="webFrame" style="flex:1;border:none;background:#fff" referrerpolicy="no-referrer"></iframe>
+    <div class="web-reader hide" style="flex:1;position:relative;background:#fff"></div>
+    <div class="web-note">💡 Tap <b>📡 Cast</b> — the page is converted to a clean Reader view that streams to your students on ANY device (tablet included). Tap Cast again to return to normal browsing.</div>
+  </section>
+</template>
+
+<template id="tpl-notes">
+  <section class="app-notes active">
+    <div class="pdf-bar">
+      <button class="btn small notes-save">💾 Save .txt</button>
+      <button class="btn small notes-clear">🗑 Clear</button>
+      <span style="font-size:12px;color:var(--text-dim)">Auto-saves on this device</span>
+    </div>
+    <textarea class="notes-area" id="notesArea" placeholder="Lesson notes… visible to students when this pane is broadcast."></textarea>
+  </section>
+</template>
+
+<template id="tpl-graph">
+  <section class="app-graph active">
+    <div class="pdf-bar">
+      <span style="font-size:13px;flex:0 0 auto">y =</span>
+      <input type="text" class="input gr-fx" placeholder="e.g. x^2 - 3*x + 2   (use ^ for power, sin, cos, tan, sqrt, log, abs)" style="flex:1;min-width:120px" />
+      <button class="btn small primary gr-plot">Plot</button>
+      <button class="btn small gr-add" title="Add as second curve">+ curve</button>
+      <button class="btn small gr-clear">Clear</button>
+      <button class="btn small gr-zo">−</button>
+      <button class="btn small gr-zi">＋</button>
+      <select class="input gr-bg" style="width:auto;padding:5px" title="Background — improve visibility for students">
+        <option value="light">⬜ White</option>
+        <option value="cream">🟨 Cream</option>
+        <option value="dark">⬛ Dark</option>
+        <option value="board">🟩 Green board</option>
+      </select>
+    </div>
+    <div class="gr-stage" style="flex:1;position:relative;background:#fff;touch-action:none">
+      <canvas class="gr-canvas" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
+    </div>
+  </section>
+</template>
+
+<template id="tpl-video">
+  <section class="app-video active">
+    <div class="pdf-bar">
+      <button class="btn small vid-open">🎬 Open video/audio</button>
+      <input type="file" class="vid-file hide" accept="video/*,audio/*" />
+      <button class="btn small vid-slow" title="Slower">🐢</button>
+      <span class="vid-rate" style="font-size:12.5px">1.0×</span>
+      <button class="btn small vid-fastr" title="Faster">🐇</button>
+      <span style="font-size:11.5px;color:var(--text-dim)">Local files only — nothing uploads</span>
+    </div>
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;background:#000;position:relative">
+      <video class="vid-el" controls playsinline style="max-width:100%;max-height:100%"></video>
+      <div class="drop-hint vid-hint"><div class="em">🎬</div><b>Open a video or audio file</b><span>Experiment clips, pronunciation audio, recorded examples…</span></div>
+    </div>
+  </section>
+</template>
+
+<template id="tpl-toolkit">
+  <section class="app-toolkit active">
+    <div class="pdf-bar">
+      <select class="input tk-mode" style="width:auto;padding:6px 8px">
+        <optgroup label="Mathematics">
+          <option value="construct">📐 Geometry construction</option>
+          <option value="mult">✖ Multiplication table</option>
+          <option value="numline">📏 Number line</option>
+          <option value="fraction">🍕 Fraction visualizer</option>
+          <option value="abacus">🧮 Place-value abacus</option>
+          <option value="hundred">🔢 Hundred square</option>
+          <option value="balance">⚖ Algebra balance</option>
+          <option value="clock">🕐 Teaching clock</option>
+          <option value="convert">🔁 Unit converter</option>
+          <option value="units">📏 Units of measurement</option>
+        </optgroup>
+        <optgroup label="Science">
+          <option value="periodic">⚛ Periodic table</option>
+          <option value="lab">🧪 Lab equipment</option>
+          <option value="plant">🌿 Plant cell</option>
+          <option value="animal">🐾 Animal cell</option>
+          <option value="thermo">🌡 Thermometer</option>
+        </optgroup>
+        <optgroup label="Classroom">
+          <option value="random">🎲 Dice · coin · spinner · names</option>
+          <option value="tally">📊 Tally chart</option>
+          <option value="score">🏅 Team scoreboard</option>
+          <option value="letters">🅰 Letter formation</option>
+          <option value="noise">🔊 Noise meter</option>
+        </optgroup>
+        <optgroup label="Library (161 reference cards)">
+          <option value="cards">📇 Reference library — Maths · Science · English · Social · ICT</option>
+        </optgroup>
+      </select>
+      <!-- construction toolbar -->
+      <span class="tk-conbar hide" style="display:flex;gap:4px;align-items:center;flex-wrap:nowrap">
+        <button class="btn small tk-con active" data-ct="ruler">📏 Ruler</button>
+        <button class="btn small tk-con" data-ct="compass">🧭 Compass</button>
+        <button class="btn small tk-con" data-ct="protractor">📐 Protractor</button>
+        <button class="btn small tk-con" data-ct="perpbis">⊥ Perp. bisector</button>
+        <button class="btn small tk-con" data-ct="angbis">∠ Angle bisector</button>
+        <button class="btn small tk-con" data-ct="point">• Point</button>
+        <button class="btn small tk-con" data-ct="erase">🧽</button>
+        <button class="btn small tk-con-undo">↩</button>
+        <button class="btn small tk-con-clear">🗑</button>
+      </span>
+      <!-- number line bar -->
+      <span class="tk-nlbar hide" style="display:flex;gap:4px;align-items:center">
+        <input class="input tk-nlmin" type="number" value="-10" style="width:70px;padding:5px" title="min" />
+        <input class="input tk-nlmax" type="number" value="10" style="width:70px;padding:5px" title="max" />
+        <select class="input tk-nlstep" style="width:auto;padding:5px"><option>1</option><option>0.5</option><option>0.25</option><option>2</option><option>5</option><option>10</option></select>
+      </span>
+      <!-- fraction bar -->
+      <span class="tk-frbar hide" style="display:flex;gap:4px;align-items:center">
+        <input class="input tk-fn1" type="number" value="1" min="0" style="width:56px;padding:5px" />/<input class="input tk-fd1" type="number" value="2" min="1" style="width:56px;padding:5px" />
+        <span style="font-size:13px">vs</span>
+        <input class="input tk-fn2" type="number" value="2" min="0" style="width:56px;padding:5px" />/<input class="input tk-fd2" type="number" value="3" min="1" style="width:56px;padding:5px" />
+        <select class="input tk-frmode" style="width:auto;padding:5px"><option value="circle">Circle</option><option value="bar">Bar</option></select>
+      </span>
+      <!-- random bar -->
+      <span class="tk-rndbar hide" style="display:flex;gap:4px;align-items:center;flex:1;min-width:0">
+        <select class="input tk-rndmode" style="width:auto;padding:5px">
+          <option value="dice">Dice</option><option value="coin">Coin</option>
+          <option value="spinner">Spinner</option><option value="names">Name picker</option>
+        </select>
+        <select class="input tk-dicen" style="width:auto;padding:5px"><option>1</option><option>2</option><option>3</option></select>
+        <input class="input tk-names" placeholder="Ada, Bayo, Chidi, …" style="flex:1;min-width:60px;padding:5px" />
+      </span>
+      <!-- tally bar -->
+      <span class="tk-tallybar hide" style="display:flex;gap:4px;align-items:center;flex:1;min-width:0">
+        <input class="input tk-tallyitems" placeholder="Option A, Option B, Option C" style="flex:1;min-width:80px;padding:5px" />
+        <button class="btn small tk-tallyset">Set</button>
+      </span>
+      <!-- scoreboard bar -->
+      <span class="tk-scbar hide" style="display:flex;gap:4px;align-items:center">
+        <select class="input tk-scn" style="width:auto;padding:5px"><option>2</option><option>3</option><option>4</option></select>
+        <input class="input tk-scnames" placeholder="Red, Blue" style="width:150px;padding:5px" />
+        <button class="btn small tk-screset">↺ 0</button>
+      </span>
+      <!-- balance bar -->
+      <span class="tk-balbar hide" style="display:flex;gap:4px;align-items:center">
+        <span style="font-size:12.5px">x =</span><input class="input tk-balx" type="number" value="4" style="width:60px;padding:5px" />
+        <span style="font-size:12.5px">+</span><input class="input tk-bala" type="number" value="3" style="width:60px;padding:5px" />
+        <span style="font-size:12.5px">coeff</span><input class="input tk-balm" type="number" value="1" min="1" max="9" style="width:56px;padding:5px" />
+        <button class="btn small tk-balset">New puzzle</button>
+      </span>
+      <!-- hundred square bar -->
+      <span class="tk-hsbar hide" style="display:flex;gap:4px;align-items:center">
+        <span style="font-size:12.5px">Count in</span>
+        <select class="input tk-hskip" style="width:auto;padding:5px"><option value="0">—</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select>
+        <button class="btn small tk-hsclear">Clear marks</button>
+      </span>
+      <!-- letters bar -->
+      <span class="tk-ltbar hide" style="display:flex;gap:4px;align-items:center">
+        <input class="input tk-ltchar" maxlength="1" value="A" style="width:56px;padding:5px;text-align:center;font-weight:700" />
+        <button class="btn small tk-ltprev">‹</button><button class="btn small tk-ltnext">›</button>
+      </span>
+      <!-- cards bar -->
+      <span class="tk-cardbar hide" style="display:flex;gap:4px;align-items:center;flex:1;min-width:0">
+        <select class="input tk-cardcat" style="width:auto;padding:5px"></select>
+        <input class="input tk-cardq" placeholder="Search 160+ cards…" style="flex:1;min-width:70px;padding:5px" />
+        <button class="btn small tk-cardprev">‹</button><button class="btn small tk-cardnext">›</button>
+      </span>
+      <span class="tk-convbar hide" style="display:flex;gap:5px;align-items:center;flex:1;min-width:0">
+        <select class="input tk-cat" style="width:auto;padding:5px"></select>
+        <input class="input tk-val" type="number" value="1" style="width:84px;padding:5px" />
+        <select class="input tk-from" style="width:auto;padding:5px"></select>
+        <span style="font-size:13px">→</span>
+        <select class="input tk-to" style="width:auto;padding:5px"></select>
+      </span>
+      <span class="tk-multbar hide" style="display:flex;gap:5px;align-items:center">
+        <span style="font-size:12.5px">up to</span>
+        <select class="input tk-multn" style="width:auto;padding:5px">
+          <option>10</option><option selected>12</option><option>15</option><option>20</option>
+        </select>
+      </span>
+      <span style="font-size:11.5px;color:var(--text-dim)">Interactive — tap items. Students see everything live.</span>
+    </div>
+    <div class="tk-stage" style="flex:1;position:relative;background:#fff"></div>
+  </section>
+</template>
+
+<template id="tpl-flash">
+  <section class="app-flash active">
+    <div class="pdf-bar">
+      <button class="btn small fc-edit">✏ Edit cards</button>
+      <button class="btn small fc-prev">‹</button>
+      <span class="fc-pos" style="font-size:13px">1 / 1</span>
+      <button class="btn small fc-next">›</button>
+      <button class="btn small fc-shuffle">🔀</button>
+      <span style="font-size:11.5px;color:var(--text-dim)">Tap the card to flip — great for definitions, vocabulary &amp; formulas</span>
+    </div>
+    <div class="fc-stage" style="flex:1;position:relative;background:#f6f8ff;display:flex;align-items:center;justify-content:center;cursor:pointer">
+      <div class="fc-card" style="width:min(82%,760px);min-height:55%;background:#fff;border:2px solid #1e2a78;border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center;padding:30px;text-align:center">
+        <span class="fc-text" style="font-size:clamp(18px,3.4vw,34px);color:#1e2a78;font-weight:700;line-height:1.4">Tap ✏ Edit cards to add your flashcards</span>
+      </div>
+    </div>
+    <textarea class="fc-editor input hide" rows="6" style="margin:8px;font-size:13px" placeholder="One card per line:  front | back&#10;Photosynthesis | Process by which green plants make food using sunlight&#10;2 x 9 | 18"></textarea>
+  </section>
+</template>
+
+<template id="tpl-stopwatch">
+  <section class="app-stopwatch active">
+    <div class="pdf-bar">
+      <select class="input sw-mode" style="width:auto;padding:5px"><option value="stopwatch">⏱ Stopwatch</option><option value="countdown">⏳ Countdown</option></select>
+      <span class="sw-cdbar hide" style="display:flex;gap:4px;align-items:center">
+        <input class="input sw-mins" type="number" value="5" min="0" style="width:64px;padding:5px" /><span style="font-size:12px">min</span>
+        <input class="input sw-secs" type="number" value="0" min="0" max="59" style="width:64px;padding:5px" /><span style="font-size:12px">sec</span>
+      </span>
+      <button class="btn small primary sw-start">▶ Start</button>
+      <button class="btn small sw-lap">🏁 Lap</button>
+      <button class="btn small sw-reset">↺ Reset</button>
+    </div>
+    <div class="sw-stage" style="flex:1;background:#10142b;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px">
+      <div class="sw-display" style="font-size:clamp(48px,11vw,130px);font-weight:800;color:#fff;font-variant-numeric:tabular-nums">00:00.0</div>
+      <div class="sw-laps" style="color:#9aa3cf;font-size:14px;max-height:24%;overflow:auto;text-align:center"></div>
+    </div>
+  </section>
+</template>
+
+<template id="tpl-image">
+  <section class="app-image active">
+    <div class="pdf-bar">
+      <button class="btn small img-open">🖼 Open image</button>
+      <input type="file" class="img-file hide" accept="image/*" />
+    </div>
+    <div class="img-scroll"><img class="img-view" alt="" /></div>
+    <div class="drop-hint img-hint"><div class="em">🖼</div><b>Open an image</b><span>Diagrams, charts, screenshots…</span></div>
+  </section>
+</template>
+
+<!-- ============ DRAWERS ============ -->
+<aside class="drawer" id="drawerStudents">
+  <div class="drawer-head">👥 Students <button class="btn small ghost drawer-close">✕</button></div>
+  <div class="drawer-body">
+    <div class="row" style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn small" id="btnLock">🔒 Lock room</button>
+      <button class="btn small" id="btnWaiting" title="Zoom-style waiting room: you admit each student">🚪 Waiting room</button>
+      <button class="btn small" id="btnMuteAll" title="Revoke every student's mic at once">🔇 Mute all</button>
+      <button class="btn small" id="btnAttendance">📋 Attendance CSV</button>
+      <button class="btn small" id="btnAskAllCams">📷 Ask all cams</button>
+      <button class="btn small" id="btnReport">📈 Class report</button>
+      <button class="btn small" id="btnNoiseMeter" title="Live class-volume gauge using the teacher device microphone">🔊 Noise meter</button>
+      <button class="btn small" id="btnGroups" title="Random group maker — students are told their group number">👥 Groups</button>
+      <button class="btn small" id="btnBehaviorCSV" title="Behaviour points export">⭐ Points CSV</button>
+    </div>
+    <hr class="sep" />
+    <div id="waitingList"></div>
+    <div id="rosterList"><p style="color:var(--text-dim);font-size:13px">No students yet. Share the room link.</p></div>
+    <hr class="sep" />
+    <b style="font-size:13px">Student cameras</b>
+    <div class="cam-grid" id="camGrid"></div>
+  </div>
+</aside>
+
+<aside class="drawer" id="drawerChat">
+  <div class="drawer-head">💬 Class chat <button class="btn small ghost drawer-close">✕</button></div>
+  <div class="drawer-body" id="chatList"></div>
+  <div class="drawer-foot">
+    <label style="display:flex;gap:6px;align-items:center;font-size:12px;color:var(--text-dim);margin-bottom:6px">
+      <input type="checkbox" id="chatPrivReply" /> 🔒 Reply privately to the last private sender
+    </label>
+    <div class="chat-input-row">
+      <input class="input" id="chatInput" placeholder="Message the class…" maxlength="500" />
+      <button class="btn primary" id="chatSend">➤</button>
+    </div>
+    <button class="btn small ghost" id="btnAnnounce" style="margin-top:8px">📢 Send full-screen announcement</button>
+    <div class="row" style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+      <button class="btn small" id="btnCaptions" title="Free browser speech-to-text captions; works best in Chrome/Edge">CC Live captions</button>
+      <button class="btn small ghost" id="btnTranscript" title="Download caption transcript as a text file">⬇ Transcript</button>
+    </div>
+    <p id="captionStatus" style="font-size:11.5px;color:var(--text-dim);margin:6px 0 0">Captions use your browser only; no AI/API key is used.</p>
+  </div>
+</aside>
+
+<aside class="drawer" id="drawerBoards">
+  <div class="drawer-head">🎨 Student whiteboards <button class="btn small ghost drawer-close">✕</button></div>
+  <div class="drawer-body">
+    <p style="font-size:12.5px;color:var(--text-dim)">Every student gets a personal board that <b>only you</b> can see — perfect for "everyone solve this now". Push your current whiteboard page as their background.</p>
+    <div class="row" style="display:flex;gap:6px;flex-wrap:wrap">
+      <button class="btn primary" id="boardsStart">▶ Start boards</button>
+      <button class="btn danger hide" id="boardsStop">⏹ Stop</button>
+      <button class="btn small" id="boardsPush" title="Send your current whiteboard page to all student boards as a background">📤 Push my board</button>
+    </div>
+    <div id="boardsGrid" class="cam-grid" style="margin-top:8px"></div>
+  </div>
+</aside>
+
+<aside class="drawer" id="drawerActivity">
+  <div class="drawer-head">🧩 Activities <button class="btn small ghost drawer-close">✕</button></div>
+  <div class="drawer-body">
+    <div id="actSetup">
+      <label>Type</label>
+      <select class="input" id="actKind">
+        <option value="open">💬 Open question — students type, you see all answers</option>
+        <option value="cloud">☁ Word cloud — one-word answers build a live cloud</option>
+        <option value="exit">🎟 Exit ticket — rating + learned + still confusing</option>
+      </select>
+      <label style="margin-top:8px">Prompt</label>
+      <input class="input" id="actPrompt" placeholder="e.g. In one word, how do you feel about today's topic?" />
+      <button class="btn primary" id="actStart" style="margin-top:10px">Start activity</button>
+    </div>
+    <div id="actLive" class="hide">
+      <b id="actLiveTitle"></b>
+      <p style="font-size:12.5px;color:var(--text-dim)"><span id="actCount">0</span> response(s)</p>
+      <div id="actResponses" style="display:flex;flex-direction:column;gap:6px;max-height:46vh;overflow:auto"></div>
+      <div class="row" style="margin-top:8px">
+        <button class="btn ok" id="actEndShare">End &amp; show class results</button>
+        <button class="btn" id="actEndQuiet">End quietly</button>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<aside class="drawer" id="drawerQuiz">
+  <div class="drawer-head">🏆 Quiz &amp; leaderboard <button class="btn small ghost drawer-close">✕</button></div>
+  <div class="drawer-body">
+    <div id="quizSetup">
+      <label>Quiz title</label>
+      <input class="input" id="quizTitle" placeholder="e.g. Quadratics check" />
+      <label style="margin-top:8px">Seconds per question</label>
+      <input class="input" id="quizSecs" type="number" value="30" min="5" max="300" style="width:110px" />
+      <label style="margin-top:8px">Questions</label>
+      <p style="font-size:12px;color:var(--text-dim);margin-bottom:6px">
+        Format — one block per question, blank line between blocks:<br/>
+        line 1 = the question · following lines = options · put <b>*</b> before the correct option.
+      </p>
+      <textarea class="input" id="quizText" rows="9" placeholder="What is 54 ÷ 6?
+*9
+8
+7
+
+Solve x+2=5
+2
+*3
+4"></textarea>
+      <div class="row" style="margin-top:8px">
+        <button class="btn primary" id="quizStart">Start quiz</button>
+        <button class="btn small" id="quizSaveBank" title="Save these questions on this device">💾 Save bank</button>
+        <select class="input" id="quizBankSel" style="width:auto"><option value="">Load saved…</option></select>
+      </div>
+      <hr class="sep" />
+      <b style="font-size:13px">📤 Or upload a CSV file</b>
+      <p style="font-size:11.5px;color:var(--text-dim);margin:4px 0">
+        Format (with or without a header row):<br/>
+        <code>Question, A, B, C, D, Correct option, Explanation/working</code><br/>
+        Correct option = A/B/C/D (or 1–4). Explanation is shown to students after they answer.
+      </p>
+      <div class="row">
+        <button class="btn small" id="quizCsvBtn">📂 Choose CSV file</button>
+        <input type="file" id="quizCsvFile" class="hide" accept=".csv,text/csv" />
+        <button class="btn small ghost" id="quizCsvTemplate">⬇ Sample CSV</button>
+      </div>
+      <p id="quizCsvStatus" style="font-size:12px;color:var(--text-dim)"></p>
+    </div>
+    <div id="quizLive" class="hide">
+      <b id="quizLiveTitle"></b>
+      <p id="quizLiveQ" style="margin:6px 0;font-size:14px"></p>
+      <p style="font-size:13px;color:var(--text-dim)"><span id="quizAnswered">0</span> answered • Q <span id="quizPos">1/1</span></p>
+      <div id="quizTally" style="margin:8px 0"></div>
+      <div class="row">
+        <button class="btn primary" id="quizNext">Next question ➜</button>
+        <button class="btn danger" id="quizEnd">End quiz</button>
+      </div>
+    </div>
+    <hr class="sep" />
+    <b style="font-size:13px">Leaderboard (this class)</b>
+    <div id="leaderList" style="display:flex;flex-direction:column;gap:6px"></div>
+    <div class="row" style="display:flex;gap:6px;flex-wrap:wrap">
+      <button class="btn small" id="scoreReset">↺ Reset all scores</button>
+      <button class="btn small" id="scoreExport" title="Per-student scores as CSV — open in Excel/Sheets for your records">📥 Scores CSV</button>
+    </div>
+  </div>
+</aside>
+
+<aside class="drawer" id="drawerPoll">
+  <div class="drawer-head">📊 Quick poll <button class="btn small ghost drawer-close">✕</button></div>
+  <div class="drawer-body">
+    <div id="pollSetup">
+      <label>Question</label>
+      <input class="input" id="pollQ" placeholder="e.g. Did you understand this step?" />
+      <label style="margin-top:8px">Options (one per line, 2–6)</label>
+      <textarea class="input" id="pollOpts" rows="4">Yes
+No
+Not sure</textarea>
+      <button class="btn primary" id="pollStart" style="margin-top:10px">Start poll</button>
+    </div>
+    <div id="pollLive" class="hide">
+      <b id="pollLiveQ"></b>
+      <div id="pollLiveBars" style="margin-top:8px"></div>
+      <button class="btn danger" id="pollEnd" style="margin-top:10px">End poll &amp; show results</button>
+    </div>
+  </div>
+</aside>
+
+<!-- ============ MODALS ============ -->
+<div class="modal-back" id="mInvite">
+  <div class="modal">
+    <h3>🔗 Invite students</h3>
+    <div id="inviteLiveWarn" style="background:#3a2626;border:1px solid var(--danger);border-radius:10px;padding:10px;font-size:13.5px;margin-bottom:10px">
+      ⚠ <b>You are not LIVE yet.</b> Students can only join AFTER you tap <b>▶ Go Live</b>.
+      Order: 1) Go Live → 2) send this link → 3) students join.
+    </div>
+    <p style="color:var(--text-dim);font-size:13.5px">Students open this link (or scan the QR) in any browser — phone, tablet or laptop. No app, no account. The link only works on your <b>deployed https:// address</b> (not on a file opened from your device).</p>
+    <div class="row"><input class="input" id="inviteLink" readonly /><button class="btn primary" id="copyLink">Copy</button></div>
+    <div id="qrBox" style="background:#fff;padding:14px;border-radius:12px;width:fit-content;margin:12px auto"></div>
+    <p style="text-align:center;font-size:14px">Room code: <code id="inviteCode" style="color:var(--accent);font-size:20px;font-weight:700"></code>
+      <span id="invitePin" style="display:block;font-size:13px;color:var(--text-dim)"></span></p>
+    <p style="font-size:12.5px;color:var(--text-dim)">🔑 To require a PIN: <b>⚙ Settings → Class PIN</b>. Students then type it on the join screen.</p>
+  </div>
+</div>
+
+<div class="modal-back" id="mSettings">
+  <div class="modal">
+    <h3>⚙ Settings</h3>
+    <label>Your display name</label>
+    <input class="input" id="setName" placeholder="e.g. Mr Adewale (HMG Academy)" />
+    <label style="margin-top:10px">Class / room name (students see this)</label>
+    <input class="input" id="setRoomName" placeholder="e.g. SS2 Mathematics — Simultaneous Equations" />
+    <label style="margin-top:10px">Broadcast mode</label>
+    <select class="input" id="setBroadcast">
+      <option value="composite">Composite (recommended on tablets) — streams whiteboard/PDF/notes/image panes</option>
+      <option value="screen">Share screen (laptops / where supported) — streams everything incl. browser/system audio where supported</option>
+    </select>
+    <p style="font-size:12px;color:var(--text-dim);margin:6px 0 0">Need to screen-share your full device inside ClassDeck? Select <b>Share screen</b>, save, then tap <b>▶ Go Live</b>. Students join from the normal invite link — no Google Meet/Zoom required.</p>
+    <label style="margin-top:10px">Broadcast quality</label>
+    <select class="input" id="setQuality">
+      <option value="1280x720x8">720p @ 8 fps — best for slow networks (default)</option>
+      <option value="1280x720x15">720p @ 15 fps</option>
+      <option value="1920x1080x10">1080p @ 10 fps — strong network only</option>
+    </select>
+    <div class="row" style="margin-top:10px">
+      <label style="display:flex;align-items:center;gap:8px;margin:0"><input type="checkbox" id="setWake" checked /> Keep screen awake during class</label>
+    </div>
+    <hr class="sep" />
+    <label>📡 Social Live / OBS broadcast centre (free workflow)</label>
+    <p style="font-size:12px;color:var(--text-dim);margin:4px 0 8px">ClassDeck runs fully in the browser, so RTMP pushing to YouTube/Facebook/Instagram/TikTok is handled with free OBS Studio or a free relay. The centre gives you a clean output link, RTMP checklist and exportable setup notes.</p>
+    <div class="row">
+      <button class="btn small" id="btnOpenStreamCentre">📡 Open centre</button>
+      <button class="btn small" id="btnOpenCleanOutput">🪟 Open clean output</button>
+      <button class="btn small ghost" id="btnObsSetup">⬇ OBS setup notes</button>
+    </div>
+    <div class="row">
+      <label style="display:flex;align-items:center;gap:8px;margin:0"><input type="checkbox" id="setNewRoom" /> Generate a new room code next time</label>
+    </div>
+    <hr class="sep" />
+    <label>🔑 Class PIN (optional — students must enter it to join; leave empty for none)</label>
+    <input class="input" id="setPin" placeholder="e.g. 2468" maxlength="8" inputmode="numeric" />
+    <hr class="sep" />
+    <label>🎨 Branding — academy name (shows on the broadcast watermark &amp; student welcome)</label>
+    <input class="input" id="setBrand" placeholder="e.g. HMG Academy" />
+    <label style="margin-top:8px">Accent colour</label>
+    <div class="row">
+      <input type="color" id="setAccent" value="#ffb347" style="width:48px;height:36px;border:none;background:none;cursor:pointer" />
+      <button class="btn small" id="setAccentReset">Reset colour</button>
+    </div>
+    <hr class="sep" />
+    <label>💾 Backup &amp; restore (settings, lessons, notes, boards — one file)</label>
+    <div class="row">
+      <button class="btn small" id="setBackup">⬇ Backup everything</button>
+      <button class="btn small" id="setRestoreBtn">⬆ Restore from file</button>
+      <input type="file" id="setRestoreFile" class="hide" accept="application/json" />
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button class="btn primary" id="setSave">Save</button>
+      <button class="btn install-btn hide" onclick="promptInstall()">⬇ Install app</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-back" id="mLessons">
+  <div class="modal">
+    <h3>📚 Lesson manager</h3>
+    <p style="color:var(--text-dim);font-size:13px">Save the current whiteboard deck (all pages) under a lesson name, and reload it any time — e.g. prepare boards before class. Stored on this device; use Export/Import to move between devices.</p>
+    <div class="row">
+      <input class="input" id="lessonName" placeholder="Lesson name, e.g. SS2 Quadratics — Week 3" style="flex:1" />
+      <button class="btn primary" id="lessonSave">💾 Save</button>
+    </div>
+    <div id="lessonList" style="display:flex;flex-direction:column;gap:8px;margin-top:10px"></div>
+    <hr class="sep" />
+    <div class="row">
+      <button class="btn small" id="lessonExport">⬇ Export current deck (.json)</button>
+      <button class="btn small" id="lessonImportBtn">⬆ Import deck (.json)</button>
+      <input type="file" id="lessonImportFile" class="hide" accept="application/json" />
+    </div>
+  </div>
+</div>
+
+<!-- v4: full scientific calculator -->
+<div id="calcBox" class="calc-box hide">
+  <div class="calc-head" id="calcDrag">🧮 Scientific calculator
+    <span>
+      <button class="btn small ghost" id="calcDeg" title="Angle unit">DEG</button>
+      <button class="btn small ghost" id="calcClose">✕</button>
+    </span>
+  </div>
+  <div class="calc-hist" id="calcHist"></div>
+  <input class="input calc-display" id="calcDisplay" readonly value="0" />
+  <div class="calc-grid sci" id="calcKeys"></div>
+</div>
+
+<!-- v4: how to see student cameras in Meet/Zoom companion mode -->
+<div class="modal-back" id="mMeetPip">
+  <div class="modal">
+    <h3>📺 Seeing your students while teaching here</h3>
+    <p style="font-size:14px;line-height:1.7;color:var(--text-dim)">
+      While Google Meet / Zoom shares your screen, you have <b>three free ways</b> to keep an eye on students:
+    </p>
+    <ol style="font-size:14px;line-height:1.8;margin:10px 0 10px 20px">
+      <li><b>Meet picture-in-picture:</b> in Google Meet (Android), tap <b>Home</b> while in the call — Meet shrinks to a floating window showing participants <i>on top of</i> this app. Drag it to a corner. (Zoom: enable <i>Settings → Meeting → Show my video in PiP</i>.)</li>
+      <li><b>Split second device:</b> join the Meet/Zoom call muted on your phone and lay it beside the tablet as a dedicated "student monitor".</li>
+      <li><b>ClassDeck hybrid:</b> have students ALSO open your ClassDeck room link (no audio needed) and share their cameras here — open the 👥 drawer to see the camera grid while Meet handles audio/screen.</li>
+    </ol>
+    <p style="font-size:13px;color:var(--text-dim)">Tip: your own camera → tap <b>📷 Cam</b>. Your face appears in a floating window on this screen, so it is included in the screen share and students see you. Drag it anywhere; tap it to cycle size.</p>
+    <button class="btn primary" onclick="closeModal('#mMeetPip')">Got it</button>
+  </div>
+</div>
+
+<!-- v6: full-screen teacher auth gate (signup / login / license) -->
+<div id="authGate" class="auth-gate hide">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <img src="assets/hmg-academy-logo.png" alt="HMG ACADEMY" />
+      <div>
+        <b>HMG ACADEMY CLASS DECK</b>
+        <span>Teacher Studio — sign in to start teaching</span>
+      </div>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="signup" onclick="switchAuthTab('signup')">Create account</button>
+      <button class="auth-tab" data-tab="login" onclick="switchAuthTab('login')">Log in</button>
+      <button class="auth-tab" data-tab="license" onclick="switchAuthTab('license')">Activate key</button>
+    </div>
+
+    <div class="auth-pane" data-tab="signup">
+      <p class="auth-note">Free for <b>3 days</b> — no card needed. Students always join free.</p>
+      <input class="input" id="suName" placeholder="Full name (e.g. Mrs Funke Ojo)" autocomplete="name" />
+      <input class="input" id="suEmail" type="email" placeholder="Email address" autocomplete="email" />
+      <input class="input" id="suPhone" type="tel" placeholder="WhatsApp / phone number" autocomplete="tel" />
+      <input class="input" id="suSchool" placeholder="School / organisation (optional)" />
+      <input class="input" id="suPw" type="password" placeholder="Password (min 6 characters)" autocomplete="new-password" />
+      <input class="input" id="suPw2" type="password" placeholder="Confirm password" autocomplete="new-password" />
+      <p class="auth-err" id="suStatus"></p>
+      <button class="btn primary auth-cta" onclick="signupTeacher()">Start my free trial ➜</button>
+    </div>
+
+    <div class="auth-pane hide" data-tab="login">
+      <p class="auth-note">Welcome back! Log in to continue.</p>
+      <input class="input" id="liEmail" type="email" placeholder="Email address" autocomplete="email" />
+      <input class="input" id="liPw" type="password" placeholder="Password" autocomplete="current-password" />
+      <p class="auth-err" id="liStatus"></p>
+      <button class="btn primary auth-cta" onclick="loginTeacher()">Log in ➜</button>
+    </div>
+
+    <div class="auth-pane hide" data-tab="license">
+      <p class="auth-note">Get your <b>HMG ACCESS KEY</b> from
+        <a href="https://hmgacademy.pages.dev" target="_blank" rel="noopener">hmgacademy.pages.dev</a> —
+        pay the small license fee and receive the key on WhatsApp within minutes.</p>
+      <input class="input" id="authKey" placeholder="HMG-202612-XXXXXXXXXX" style="text-transform:uppercase" />
+      <p class="auth-err" id="authStatus"></p>
+      <button class="btn primary auth-cta" onclick="activateLicense()">Activate ➜</button>
+      <button class="btn ghost auth-cta hide" id="authSkip" onclick="authSkip()">Continue trial for now</button>
+    </div>
+
+    <p class="auth-foot">Built by HMG ACADEMY · Lagos, Nigeria — your data stays on your device.</p>
+  </div>
+</div>
+
+<!-- v6: recording setup (YouTube-ready branded video) -->
+<div class="modal-back" id="mRecSetup">
+  <div class="modal">
+    <h3>⏺ Record lesson (YouTube-ready)</h3>
+    <p style="color:var(--text-dim);font-size:13px">Records the two split panes under a branded header — <b>your own brand, logo and name</b> — plus your camera (bottom-right) when it is on. Ready to post on your channel.</p>
+    <label>Subject</label>
+    <input class="input" id="recSubject" placeholder="e.g. Mathematics" />
+    <label style="margin-top:8px">Topic</label>
+    <input class="input" id="recTopic" placeholder="e.g. Simultaneous Equations — Elimination Method" />
+    <label style="margin-top:8px">Class</label>
+    <input class="input" id="recClass" placeholder="e.g. SS2" />
+    <label style="margin-top:8px">Brand name on the video (your academy / your name)</label>
+    <input class="input" id="recBrand" placeholder="e.g. Funke's Tutorials" />
+    <label style="margin-top:8px">Footer credit (e.g. your YouTube / WhatsApp)</label>
+    <input class="input" id="recFooter" placeholder="e.g. ▶ Funke's Tutorials on YouTube · 0803-xxx-xxxx" />
+    <div class="row" style="margin-top:6px">
+      <button class="btn small" id="recLogoBtn">🖼 Upload your logo (optional)</button>
+      <input type="file" id="recLogoFile" class="hide" accept="image/*" />
+      <span id="recLogoStatus" style="font-size:12px;color:var(--text-dim)"></span>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <label style="display:flex;align-items:center;gap:8px;margin:0">
+        <input type="checkbox" id="recStudents" /> Include student cameras (up to 3 tiles, left edge)
+      </label>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn primary" id="recBegin">⏺ Start recording</button>
+      <button class="btn" onclick="closeModal('#mRecSetup')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- v3: class report modal -->
+<div class="modal-back" id="mReport">
+  <div class="modal">
+    <h3>📈 Class report</h3>
+    <div id="reportBody" style="font-size:14px;line-height:1.7"></div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn primary" id="reportDownload">⬇ Download report (.txt)</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-back" id="mNoise">
+  <div class="modal">
+    <h3>🔊 Noise meter</h3>
+    <p style="color:var(--text-dim);font-size:13px">Free local microphone analyser. Nothing is recorded or uploaded. When open, the gauge is also painted into the live broadcast/recording overlay so students can self-regulate.</p>
+    <div id="noiseGauge" style="height:30px;background:#eef1ff;border-radius:999px;overflow:hidden;border:1px solid var(--line);margin:10px 0"><i style="display:block;height:100%;width:0%;background:linear-gradient(90deg,#1d8f4f,#f59e0b,#e02b2b)"></i></div>
+    <div class="row" style="align-items:center">
+      <span style="font-size:13px;color:var(--text-dim)">Threshold</span>
+      <input type="range" id="noiseThreshold" min="20" max="95" value="70" style="flex:1" />
+      <b id="noiseLevel">0%</b>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn primary" id="noiseStart">▶ Start meter</button>
+      <button class="btn danger" id="noiseStop">⏹ Stop</button>
+      <button class="btn" onclick="closeModal('#mNoise')">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-back" id="mTimer">
+  <div class="modal">
+    <h3>⏱ Countdown timer</h3>
+    <p style="color:var(--text-dim);font-size:13px">Great for exercises: “You have 5 minutes for question 3.”</p>
+    <div class="row">
+      <button class="btn" data-min="1">1 min</button>
+      <button class="btn" data-min="2">2 min</button>
+      <button class="btn" data-min="5">5 min</button>
+      <button class="btn" data-min="10">10 min</button>
+      <input class="input" id="timerCustom" type="number" placeholder="mins" style="width:90px" min="1" />
+      <button class="btn primary" id="timerStartCustom">Start</button>
+    </div>
+    <button class="btn danger" id="timerStop" style="margin-top:6px">Stop timer</button>
+  </div>
+</div>
+
+<script src="vendor/peerjs.min.js"></script>
+<script src="vendor/pdf.min.js"></script>
+<script src="vendor/qrcode.min.js"></script>
+<script src="js/common.js"></script>
+<script src="js/whiteboard.js"></script>
+<script src="js/webcast.js"></script>
+<script src="js/toolkit.js"></script>
+<script src="js/toolkit-data.js"></script>
+<script src="js/toolkit-data2.js"></script>
+<script src="js/toolkit-ext.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/rtc.js"></script>
+<script src="js/teach.js"></script>
 </body>
 </html>

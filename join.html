@@ -1,231 +1,201 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Join Class — HMG ACADEMY CLASS DECK v3</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        body { font-family: 'Inter', system_ui, sans-serif; }
-        .hmg-logo { font-weight: 800; letter-spacing: -1.5px; }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Join class — HMG ACADEMY CLASS DECK</title>
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" href="assets/icon-96.png" />
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+<meta name="theme-color" content="#1e2a78" />
+<link rel="stylesheet" href="css/style.css" />
 </head>
-<body class="bg-slate-100">
-    <div class="max-w-md mx-auto pt-6">
-        <div class="bg-white shadow-xl rounded-[3rem] p-1 mx-4">
-            <div class="px-5 pt-7 pb-6">
-                <!-- Header -->
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center">
-                        <div class="w-9 h-9 bg-[#0A3D62] flex items-center justify-center text-white rounded-2xl">
-                            <i class="fas fa-users text-xl"></i>
-                        </div>
-                        <div class="ml-3">
-                            <span class="font-extrabold text-3xl text-[#0A3D62]">HMG</span>
-                            <span class="font-bold text-xl">ClassDeck</span>
-                        </div>
-                    </div>
-                    <div class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-3xl text-xs font-extrabold px-3">v3.2</div>
-                </div>
-                
-                <div class="mt-5">
-                    <h1 class="text-3xl font-extrabold">Join your class</h1>
-                    <p class="text-slate-600 text-sm mt-1">No account needed. Works on any phone, tablet or laptop.</p>
-                </div>
-                
-                <div class="mt-6">
-                    <div class="text-xs font-bold px-1 mb-1">Room code</div>
-                    <input id="room-code" type="text" value="HMG-94KX2" class="w-full px-4 py-[9px] border rounded-[2rem] text-sm font-semibold">
-                    
-                    <div class="mt-3 text-xs font-bold px-1 mb-1">Your name</div>
-                    <input id="student-name" type="text" value="Chioma Eze" class="w-full px-4 py-[9px] border rounded-[2rem] text-sm font-semibold">
-                    
-                    <div class="mt-3 text-xs font-bold px-1 mb-1">Class PIN (if required)</div>
-                    <input id="class-pin" type="text" placeholder="Optional" class="w-full px-4 py-[9px] border rounded-[2rem] text-sm font-semibold">
-                    
-                    <button onclick="joinClass()" 
-                            class="mt-5 w-full py-3 flex items-center justify-center font-extrabold bg-[#0A3D62] text-white rounded-[3rem]">
-                        <span>Join class now</span>
-                    </button>
-                </div>
-                
-                <div class="mt-4 flex justify-center items-center gap-x-3 text-xs">
-                    <button onclick="scanQR()" class="flex items-center px-3 py-1.5 gap-x-1 text-xs font-bold bg-white border px-4 rounded-[2rem]">
-                        <i class="fas fa-qrcode"></i> <span>Scan QR</span>
-                    </button>
-                    <button onclick="manualJoin()" class="flex items-center px-3 py-1.5 gap-x-1 text-xs font-bold bg-white border px-4 rounded-[2rem]">
-                        <i class="fas fa-link"></i> <span>Manual join</span>
-                    </button>
-                </div>
-                
-                <div class="mt-5 pt-4 border-t">
-                    <div class="text-xs text-center">
-                        <span class="font-extrabold">Teacher must be LIVE</span> before you can join.
-                    </div>
-                    
-                    <div class="flex justify-center mt-2 text-xs">
-                        <div class="flex items-center gap-x-1 px-2">
-                            <div class="px-2 py-[1px] rounded-3xl bg-emerald-100 text-emerald-700 flex items-center text-xs px-3">
-                                <i class="fas fa-check mr-1"></i>
-                                <span class="font-bold">34 students already joined</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Student dashboard preview -->
-        <div class="px-4 mt-6">
-            <div class="text-xs font-bold px-1 mb-1">Once joined you will see:</div>
-            
-            <div class="grid grid-cols-2 gap-2 text-xs">
-                <div class="bg-white p-2.5 rounded-2xl border">
-                    <div class="flex items-center"><i class="fas fa-chalkboard text-emerald-600 mr-1"></i> <span class="font-bold">Live whiteboard</span></div>
-                    <div class="text-xs mt-0.5">See teacher annotations live</div>
-                </div>
-                <div class="bg-white p-2.5 rounded-2xl border">
-                    <div class="flex items-center"><i class="fas fa-tasks text-emerald-600 mr-1"></i> <span class="font-bold">Assignments</span></div>
-                    <div class="text-xs mt-0.5">Submit work instantly</div>
-                </div>
-                <div class="bg-white p-2.5 rounded-2xl border">
-                    <div class="flex items-center"><i class="fas fa-poll text-emerald-600 mr-1"></i> <span class="font-bold">Polls &amp; Quizzes</span></div>
-                    <div class="text-xs mt-0.5">Participate live</div>
-                </div>
-                <div class="bg-white p-2.5 rounded-2xl border">
-                    <div class="flex items-center"><i class="fas fa-microphone text-emerald-600 mr-1"></i> <span class="font-bold">Voice notes</span></div>
-                    <div class="text-xs mt-0.5">Record your answers</div>
-                </div>
-            </div>
-            
-            <div class="mt-3 px-1">
-                <div class="text-xs flex items-center justify-center">
-                    <div onclick="demoStudentJoin()" class="cursor-pointer px-3 py-[3px] flex items-center bg-white px-3 border rounded-[2rem] text-xs font-bold">
-                        <span>Demo join as student</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+<body>
+
+<!-- ===== join gate ===== -->
+<div class="join-gate" id="joinGate">
+  <div class="join-card">
+    <img src="assets/icon-192.png" alt="HMG Academy Class Deck" />
+    <h2>HMG ACADEMY CLASS DECK</h2>
+    <p class="sub">Join your class — no account needed. Works on any phone, tablet or laptop.</p>
+    <p class="sub" style="background:var(--bg-2);border:1px solid var(--line);border-radius:10px;padding:8px;font-size:12px">
+      ℹ The teacher must be <b>LIVE</b> (▶ Go Live pressed on their side) before you can join.
+      If it says "class not found", wait for your teacher to start, then tap Join again.</p>
+    <span id="roomChip" class="badge hide" style="align-self:center;font-size:13px;padding:6px 14px;background:var(--bg-3);color:var(--accent);font-weight:700"></span>
+    <div id="roomFieldWrap">
+      <label style="font-size:13px;color:var(--text-dim)">Room code</label>
+      <input class="input" id="inRoom" placeholder="e.g. K7M2QX" autocapitalize="characters" maxlength="10" style="text-transform:uppercase;letter-spacing:2px;font-weight:700" />
     </div>
-    
-    <div class="max-w-md mx-auto px-4 mt-8 text-xs text-center text-slate-400">
-        Free for students • 100% offline capable • No personal data stored
+    <div>
+      <label style="font-size:13px;color:var(--text-dim)">Your name</label>
+      <input class="input" id="inName" placeholder="e.g. Chidinma O." maxlength="40" />
     </div>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        function joinClass() {
-            const code = document.getElementById('room-code').value || 'HMG-94KX2';
-            const name = document.getElementById('student-name').value || 'Student';
-            
-            localStorage.setItem('hmg_student_name', name);
-            localStorage.setItem('hmg_room_code', code);
-            localStorage.setItem('hmg_joined', 'true');
-            
-            // Simulate successful join
-            const btns = event.currentTarget;
-            document.body.innerHTML = `
-                <div class="max-w-md mx-auto pt-8 px-4">
-                    <div class="bg-white border rounded-[3rem] p-6 shadow">
-                        <div class="text-center">
-                            <i class="fas fa-check-circle text-emerald-600 fa-3x mb-2"></i>
-                            <div class="font-extrabold text-2xl">Joined successfully!</div>
-                            <div class="mt-1">Welcome, <span class="font-bold">${name}</span></div>
-                            
-                            <div class="mt-6 text-xs px-2">
-                                <div class="px-3 py-3 bg-emerald-50 rounded-2xl text-emerald-700">
-                                    <span class="font-extrabold">Class: JSS2 Maths • Room ${code}</span><br>
-                                    <span>Teacher: Adewale S. is LIVE</span>
-                                </div>
-                            </div>
-                            
-                            <div class="mt-6 grid grid-cols-2 gap-2 text-xs">
-                                <div onclick="goToStudentWorkspace()" class="bg-emerald-600 text-white font-extrabold py-3 rounded-[2rem] cursor-pointer">Open Workspace</div>
-                                <div onclick="goToStudentPortal()" class="border font-extrabold py-3 rounded-[2rem] cursor-pointer">View My Portfolio</div>
-                            </div>
-                            
-                            <div class="mt-5 text-[10px] text-emerald-700">Your camera &amp; mic will be activated only when the teacher requests.</div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-        
-        function scanQR() {
-            const modal = document.createElement('div');
-            modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center';
-            modal.innerHTML = `
-                <div class="bg-white rounded-3xl p-6 max-w-xs mx-4 text-center">
-                    <div class="font-extrabold">QR Scanner</div>
-                    <div class="mx-auto mt-4 w-40 h-40 border-4 border-dashed border-emerald-300 rounded-3xl flex items-center justify-center">
-                        <div class="text-center">
-                            <i class="fas fa-qrcode fa-3x text-emerald-300"></i>
-                            <div class="text-xs mt-2">Simulated QR scan</div>
-                        </div>
-                    </div>
-                    <div class="mt-5">
-                        <button onclick="simulateQRScan(this)" class="px-6 text-sm font-extrabold py-2 bg-emerald-600 text-white rounded-[3rem]">Scan now (demo)</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-        
-        function simulateQRScan(el) {
-            el.closest('.fixed').remove();
-            document.getElementById('room-code').value = 'HMG-94KX2';
-            setTimeout(() => {
-                alert('QR scanned successfully! Room code populated.');
-            }, 400);
-        }
-        
-        function manualJoin() {
-            const url = prompt('Paste the class offer URL or room code:', 'https://hmgacademyhub.github.io/classdeck/join.html?room=HMG-94KX2');
-            if (url) {
-                document.getElementById('room-code').value = url.includes('?room=') ? url.split('=')[1] : url;
-                setTimeout(() => {
-                    joinClass();
-                }, 400);
-            }
-        }
-        
-        function goToStudentWorkspace() {
-            // Redirect to a student view (simplified)
-            window.location.href = 'index.html#student-workspace';
-            // In production would open a live student view
-            alert('Student live workspace would open here. (In real app this would open a full live view with synced whiteboard, polls and submission tools.)');
-        }
-        
-        function goToStudentPortal() {
-            window.location.href = 'parent.html'; // Reuse parent for student view simulation
-        }
-        
-        function demoStudentJoin() {
-            localStorage.setItem('hmg_student_name', 'Demo Student');
-            localStorage.setItem('hmg_room_code', 'HMG-94KX2');
-            localStorage.setItem('hmg_joined', 'true');
-            window.location.href = 'index.html';
-        }
-        
-        // Keyboard support
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                const room = document.getElementById('room-code');
-                if (room && document.activeElement === room) {
-                    joinClass();
-                }
-            }
-        });
-        
-        // Load saved data if present
-        window.onload = function() {
-            const savedName = localStorage.getItem('hmg_student_name');
-            if (savedName) {
-                const nameField = document.getElementById('student-name');
-                if (nameField) nameField.value = savedName;
-            }
-        }
-    </script>
+    <div>
+      <label style="font-size:13px;color:var(--text-dim)">Class PIN (only if your teacher set one)</label>
+      <input class="input" id="inPin" placeholder="e.g. 2468" maxlength="8" inputmode="numeric" />
+    </div>
+    <button class="btn primary" id="btnJoin" style="padding:12px">Join class ➜</button>
+    <p class="sub" id="joinStatus"></p>
+  </div>
+</div>
+
+<!-- ===== live stage ===== -->
+<div class="stage-wrap hide" id="stageWrap">
+  <video id="stageVideo" autoplay playsinline></video>
+</div>
+
+<!-- teacher camera picture-in-picture (draggable) -->
+<div class="teacher-pip" id="teacherPip"><video id="teacherVideo" autoplay playsinline></video></div>
+
+<!-- status chips -->
+<div class="stage-status hide" id="stageStatus">
+  <span class="badge live">● LIVE</span>
+  <span class="badge" id="roomNameChip"></span>
+  <span class="badge" id="countChip">👥 1</span>
+</div>
+
+<!-- tap-to-unmute overlay (autoplay policy) -->
+<div class="modal-back" id="mUnmute">
+  <div class="modal" style="text-align:center">
+    <h3>🔊 Tap to start audio &amp; video</h3>
+    <p style="color:var(--text-dim);font-size:14px;margin-bottom:14px">Your browser requires one tap before sound can play.</p>
+    <button class="btn primary" id="btnUnmute" style="padding:14px 26px;font-size:16px">▶ Start class view</button>
+  </div>
+</div>
+
+<!-- student controls -->
+<div class="stu-controls hidden" id="stuControls">
+  <button class="btn icon" id="sBtnHand" title="Raise hand">✋</button>
+  <button class="btn icon" id="sBtnReact" title="Send a reaction">😀</button>
+  <button class="btn icon" id="sBtnChat" title="Chat">💬</button>
+  <button class="btn icon" id="sBtnCam" title="My camera">📷</button>
+  <button class="btn icon" id="sBtnScreen" title="Share my screen with the teacher">🖥</button>
+  <button class="btn icon" id="sBtnMic" title="My mic (teacher must allow)" disabled>🎙</button>
+  <button class="btn icon" id="sBtnFull" title="Fullscreen">⛶</button>
+  <button class="btn icon danger" id="sBtnLeave" title="Leave">🚪</button>
+</div>
+
+<!-- chat drawer -->
+<aside class="drawer" id="sDrawerChat" style="top:0">
+  <div class="drawer-head">💬 Class chat <button class="btn small ghost" id="sChatClose">✕</button></div>
+  <div class="drawer-body" id="sChatList"></div>
+  <div class="drawer-foot">
+    <label style="display:flex;gap:6px;align-items:center;font-size:12px;color:var(--text-dim);margin-bottom:6px">
+      <input type="checkbox" id="sChatPriv" /> 🔒 Send privately to teacher only
+    </label>
+    <div class="chat-input-row">
+      <input class="input" id="sChatInput" placeholder="Ask a question…" maxlength="500" />
+      <button class="btn primary" id="sChatSend">➤</button>
+    </div>
+  </div>
+</aside>
+
+<!-- v8: personal student whiteboard (teacher-only visibility) -->
+<div id="sBoardWrap" class="hide" style="position:fixed;inset:0;z-index:70;background:rgba(8,10,30,.96);display:flex;flex-direction:column">
+  <div style="display:flex;gap:6px;align-items:center;padding:8px 10px;background:var(--bg-2)">
+    <b style="font-size:14px">🎨 Your whiteboard</b>
+    <span style="font-size:11.5px;color:var(--text-dim)">only your teacher sees this</span>
+    <span style="flex:1"></span>
+    <span class="sb-colors" style="display:flex;gap:4px">
+      <span class="sb-c" data-c="#111111" style="width:24px;height:24px;border-radius:50%;background:#111;cursor:pointer;border:2px solid #fff"></span>
+      <span class="sb-c" data-c="#e02b2b" style="width:24px;height:24px;border-radius:50%;background:#e02b2b;cursor:pointer;border:2px solid transparent"></span>
+      <span class="sb-c" data-c="#1565d8" style="width:24px;height:24px;border-radius:50%;background:#1565d8;cursor:pointer;border:2px solid transparent"></span>
+      <span class="sb-c" data-c="#0a8a3a" style="width:24px;height:24px;border-radius:50%;background:#0a8a3a;cursor:pointer;border:2px solid transparent"></span>
+    </span>
+    <button class="btn small" id="sbUndo">↩</button>
+    <button class="btn small" id="sbClear">🗑</button>
+    <button class="btn small" id="sbMin" title="Back to the lesson view">📺 Lesson</button>
+  </div>
+  <div id="sBoardStage" style="flex:1;position:relative;background:#fff;touch-action:none"></div>
+</div>
+<button id="sbReopen" class="btn icon hide" style="position:fixed;left:14px;bottom:74px;z-index:60" title="Open my whiteboard">🎨</button>
+
+<!-- v8: group banner -->
+<div id="sGroupBanner" class="hide" style="position:fixed;top:0;left:0;right:0;z-index:65;background:#1d6f42;color:#fff;text-align:center;padding:7px;font-weight:700;font-size:15px"></div>
+
+<!-- Enterprise accessibility: live caption banner sent by the teacher's browser speech recognition -->
+<div id="sCaptionBanner" class="hide" aria-live="polite" style="position:fixed;left:50%;bottom:92px;transform:translateX(-50%);z-index:66;max-width:min(92vw,900px);background:rgba(0,0,0,.78);color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:10px 14px;font-size:clamp(15px,2.5vw,22px);line-height:1.35;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.35)"></div>
+
+<!-- v8: activity modal -->
+<div class="modal-back" id="mActivity">
+  <div class="modal">
+    <h3 id="sActTitle">🧩 Activity</h3>
+    <div id="sActOpen" class="hide">
+      <textarea class="input" id="sActText" rows="3" maxlength="280" placeholder="Type your answer…"></textarea>
+    </div>
+    <div id="sActExit" class="hide">
+      <label style="font-size:13px;color:var(--text-dim)">How well did you understand today? </label>
+      <div id="sActStars" style="display:flex;gap:6px;font-size:30px;cursor:pointer;margin:6px 0">
+        <span data-r="1">☆</span><span data-r="2">☆</span><span data-r="3">☆</span><span data-r="4">☆</span><span data-r="5">☆</span>
+      </div>
+      <input class="input" id="sActLearned" placeholder="One thing you learned today" style="margin-top:6px" />
+      <input class="input" id="sActConfusing" placeholder="One thing still confusing (optional)" style="margin-top:6px" />
+    </div>
+    <button class="btn primary" id="sActSend" style="margin-top:10px">Send ➜</button>
+    <p id="sActDone" class="hide" style="color:var(--ok);font-weight:700;margin-top:8px">✔ Sent — thank you!</p>
+  </div>
+</div>
+
+<!-- v8: class results modal -->
+<div class="modal-back" id="mActResults">
+  <div class="modal">
+    <h3 id="sResTitle">☁ Class results</h3>
+    <div id="sResBody" style="line-height:2;max-height:60vh;overflow:auto"></div>
+    <button class="btn primary" onclick="closeModal('#mActResults')" style="margin-top:8px">Close</button>
+  </div>
+</div>
+
+<!-- v4: reaction picker -->
+<div id="reactBar" class="hide" style="position:fixed;bottom:74px;left:50%;transform:translateX(-50%);z-index:60;display:flex;gap:6px;background:rgba(16,20,43,.92);border:1px solid var(--line);border-radius:999px;padding:8px 12px">
+  <button class="btn icon ghost react-emo">👍</button>
+  <button class="btn icon ghost react-emo">❤️</button>
+  <button class="btn icon ghost react-emo">😂</button>
+  <button class="btn icon ghost react-emo">🎉</button>
+  <button class="btn icon ghost react-emo">😮</button>
+  <button class="btn icon ghost react-emo">👏</button>
+</div>
+
+<!-- v4: waiting room overlay -->
+<div class="modal-back" id="mWaiting">
+  <div class="modal" style="text-align:center">
+    <h3>🚪 Waiting room</h3>
+    <p style="color:var(--text-dim);font-size:14px;margin:10px 0">You're in the waiting room.<br/>Your teacher will admit you shortly — please stay on this page.</p>
+    <div class="badge live" style="display:inline-block">waiting…</div>
+  </div>
+</div>
+
+<!-- v3: quiz modal -->
+<div class="modal-back" id="mQuiz">
+  <div class="modal">
+    <h3 id="sQuizTitle">🏆 Quiz</h3>
+    <p style="color:var(--text-dim);font-size:12.5px">Question <span id="sQuizPos">1/1</span> • answer fast for bonus points! <b id="sQuizTimer"></b></p>
+    <b id="sQuizQ" style="display:block;margin:10px 0;font-size:16px"></b>
+    <div id="sQuizOpts" style="display:flex;flex-direction:column;gap:8px"></div>
+    <div id="sQuizFb" class="hide" style="margin-top:10px;font-weight:700;font-size:15px"></div>
+  </div>
+</div>
+
+<!-- poll modal -->
+<div class="modal-back" id="mPoll">
+  <div class="modal">
+    <h3>📊 Quick poll</h3>
+    <b id="sPollQ" style="display:block;margin-bottom:10px"></b>
+    <div id="sPollOpts" style="display:flex;flex-direction:column;gap:8px"></div>
+  </div>
+</div>
+
+<!-- announcement overlay -->
+<div class="modal-back" id="mAnnounce">
+  <div class="modal" style="text-align:center">
+    <h3>📢 Announcement</h3>
+    <p id="announceText" style="font-size:18px;line-height:1.5;margin:10px 0"></p>
+    <button class="btn primary" onclick="closeModal('#mAnnounce')">OK</button>
+  </div>
+</div>
+
+<script src="vendor/peerjs.min.js"></script>
+<script src="js/common.js"></script>
+<script src="js/rtc.js"></script>
+<script src="js/join.js"></script>
 </body>
 </html>

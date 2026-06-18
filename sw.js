@@ -1,54 +1,80 @@
-// HMG ClassDeck Service Worker (Offline-first)
-const CACHE_NAME = 'hmg-classdeck-v3.2';
+/* ============================================================
+   HMG ClassDeck — Service Worker
+   Cache-first for the app shell so the studio opens instantly
+   and works offline (live class still needs internet, but the
+   whiteboard/PDF/notes work fully offline).
+   Bump CACHE_VERSION whenever you deploy changes.
+   ============================================================ */
+const CACHE_VERSION = "hmg-classdeck-v9.0.0";
 
-const ASSETS = [
-  './',
-  './index.html',
-  './teach.html',
-  './join.html',
-  './parent.html',
-  './classroom.html',
-  './cbt.html',
-  './community.html',
-  './manifest.json',
-  'https://cdn.tailwindcss.com',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css'
+const SHELL = [
+  "./",
+  "./index.html",
+  "./teach.html",
+  "./admin.html",
+  "./join.html",
+  "./stream.html",
+  "./css/style.css",
+  "./js/common.js",
+  "./js/whiteboard.js",
+  "./js/webcast.js",
+  "./js/rtc.js",
+  "./js/teach.js",
+  "./js/toolkit.js",
+  "./js/toolkit-data.js",
+  "./js/toolkit-data2.js",
+  "./js/toolkit-ext.js",
+  "./js/auth.js",
+  "./js/join.js",
+  "./vendor/peerjs.min.js",
+  "./vendor/pdf.min.js",
+  "./vendor/pdf.worker.min.js",
+  "./vendor/qrcode.min.js",
+  "./assets/icon-96.png",
+  "./assets/hmg-academy-logo.png",
+  "./assets/founder-photo.jpg",
+  "./assets/icon-192.png",
+  "./assets/icon-512.png",
+  "./assets/apple-touch-icon.png",
+  "./manifest.webmanifest"
 ];
 
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
-    })
+self.addEventListener("install", (e) => {
+  e.waitUntil(
+    caches.open(CACHE_VERSION).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.filter((name) => name !== CACHE_NAME).map((name) => caches.delete(name))
-      );
-    })
+self.addEventListener("activate", (e) => {
+  e.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(keys.filter((k) => k !== CACHE_VERSION).map((k) => caches.delete(k)))
+    ).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      return cachedResponse || fetch(event.request).then((response) => {
-        return caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, response.clone());
-          return response;
-        });
-      }).catch(() => {
-        // Offline fallback
-        if (event.request.destination === 'document') {
-          return caches.match('./index.html');
+self.addEventListener("fetch", (e) => {
+  const url = new URL(e.request.url);
+  // Never intercept WebRTC signalling or cross-origin calls.
+  if (url.origin !== location.origin) return;
+  if (e.request.method !== "GET") return;
+
+  e.respondWith(
+    caches.match(e.request, { ignoreSearch: true }).then((hit) => {
+      if (hit) {
+        // refresh in background (stale-while-revalidate)
+        fetch(e.request).then((res) => {
+          if (res && res.ok) caches.open(CACHE_VERSION).then((c) => c.put(e.request, res));
+        }).catch(() => {});
+        return hit;
+      }
+      return fetch(e.request).then((res) => {
+        if (res && res.ok) {
+          const clone = res.clone();
+          caches.open(CACHE_VERSION).then((c) => c.put(e.request, clone));
         }
-      });
+        return res;
+      }).catch(() => caches.match("./index.html"));
     })
   );
 });
