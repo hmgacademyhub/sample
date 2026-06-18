@@ -1,0 +1,16 @@
+name = "hmg-classdeck-license-gateway"
+main = "worker.js"
+compatibility_date = "2026-06-18"
+
+[vars]
+TRIAL_DAYS = "3"
+LEASE_MINUTES = "30"
+# Set ADMIN_SECRET with: wrangler secret put ADMIN_SECRET
+# Optional fallback JSON list if you do not use KV for license records:
+LICENSES_JSON = "[]"
+
+# Create KV: wrangler kv namespace create LICENSE_KV
+# Then paste the id below.
+[[kv_namespaces]]
+binding = "LICENSE_KV"
+id = "PASTE_KV_NAMESPACE_ID"
