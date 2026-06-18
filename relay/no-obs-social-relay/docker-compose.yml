@@ -1,0 +1,55 @@
+services:
+  srs:
+    image: ossrs/srs:5
+    container_name: classdeck-srs
+    restart: unless-stopped
+    environment:
+      - CANDIDATE=${PUBLIC_IP}
+    volumes:
+      - ./srs.conf:/usr/local/srs/conf/srs.conf:ro
+    command: ./objs/srs -c conf/srs.conf
+    ports:
+      - "1935:1935"
+      - "8000:8000/udp"
+    networks:
+      - classdeck
+
+  controller:
+    build: ./controller
+    container_name: classdeck-relay-controller
+    restart: unless-stopped
+    environment:
+      - RELAY_SECRET=${RELAY_SECRET}
+      - SRS_RTMP=rtmp://srs:1935/live
+      - NODE_ENV=production
+    depends_on:
+      - srs
+    networks:
+      - classdeck
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: classdeck-caddy
+    restart: unless-stopped
+    environment:
+      - DOMAIN=${DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - srs
+      - controller
+    networks:
+      - classdeck
+
+networks:
+  classdeck:
+    driver: bridge
+
+volumes:
+  caddy_data:
+  caddy_config:
