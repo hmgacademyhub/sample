@@ -198,3 +198,87 @@ This uses your browser's speech recognition only. No AI API key is required.
 5. When active, the noise gauge appears in the broadcast overlay so learners can self-regulate.
 
 Nothing is recorded or uploaded by the noise meter.
+
+---
+
+# ClassDesk v2 Addendum — Direct Tablet Screen and No-OBS Social Live
+
+## 1. Share your ClassDeck screen directly to students
+
+1. Open `teach.html`.
+2. Tap **▶ Go Live**.
+3. Students join with the normal room code/link.
+4. They see the ClassDeck teaching workspace directly — no Google Meet or Zoom required.
+
+## 2. Try full tablet screen sharing
+
+1. Open **⚙ Settings**.
+2. Tap **🖥 Try full tablet screen**.
+3. If your tablet browser supports full screen capture, choose what to share.
+4. If it does not, ClassDeck will continue with workspace capture.
+
+## 3. Stream to social media from tablet without OBS
+
+1. Deploy the included relay: `relay/no-obs-social-relay/`.
+2. Open `teach.html` on your tablet.
+3. Open **⚙ Settings → 📡 Tablet Live**.
+4. Enter your relay gateway URL and secret.
+5. Paste full RTMP/RTMPS publish URLs from YouTube, Facebook, Instagram, TikTok or custom destination.
+6. Choose:
+   - Landscape 16:9 for YouTube/Facebook.
+   - Vertical 9:16 for TikTok/Instagram.
+7. Tap **📡 Start tablet social live**.
+
+## 4. If you do not have the relay yet
+
+Open `stream.html`. It explains the no-OBS workflow and links to browser-based live studios. These options depend on each provider's free plan and your account eligibility.
+
+---
+
+# ClassDesk v3 Addendum — Security and Picture-in-Picture
+
+## A. Use Picture-in-Picture while teaching
+
+1. Open Teacher Studio.
+2. Start your class or prepare your board.
+3. Tap **▣ PiP** in the top toolbar.
+4. Keep the floating PiP window open while switching/minimising.
+
+Note: browsers require you to tap the PiP button yourself. A website cannot force PiP automatically after you minimise.
+
+## B. Secure invite links
+
+1. Open **⚙ Settings**.
+2. Tick **Require secure invite link token**.
+3. Save.
+4. Share the invite link from **🔗 Invite**.
+
+Students must use the link. Room-code-only entry will be rejected while this option is on.
+
+## C. Forensic watermark
+
+1. Open **⚙ Settings**.
+2. Keep **Add forensic watermark** enabled.
+3. Live broadcasts and recordings are stamped faintly with teacher/room information.
+
+This discourages unauthorised recording or resale.
+
+## D. Export security audit log
+
+1. Open **👥 Students** drawer.
+2. Tap **🛡 Audit CSV**.
+3. Save the CSV for records.
+
+## E. Subscription protection
+
+For strongest subscription protection, the platform owner should deploy the Cloudflare Worker gateway in:
+
+```text
+security/license-gateway-worker/
+```
+
+Then set the Worker URL in:
+
+```text
+js/security-config.js
+```

@@ -293,3 +293,161 @@ ClassDeck is static and browser-based, so it does not directly push RTMP. Use th
    - OBS Multiple RTMP Outputs plugin, or
    - a free relay/multistream service if its free plan fits your needs.
 7. Keep stream keys outside ClassDeck. Do not publish stream keys in GitHub.
+
+---
+
+# ClassDesk v2 deployment addendum — direct tablet social live
+
+ClassDesk v2 contains two deployable parts:
+
+1. **Static app** — upload the contents of `classdesk v2/` to GitHub Pages, Cloudflare Pages, Netlify, etc.
+2. **Optional no-OBS relay** — deploy `relay/no-obs-social-relay/` to a Linux VM if you want direct tablet-to-social RTMP streaming without OBS.
+
+## A. Static app upload checklist
+
+Upload these to the repository root:
+
+```text
+index.html
+teach.html
+join.html
+stream.html
+sitemap.xml
+robots.txt
+sw.js
+manifest.webmanifest
+css/
+js/
+assets/
+vendor/
+docs/
+relay/
+```
+
+`relay/` can be kept in the same GitHub repo as deployment documentation/source files. GitHub Pages will not run it; it is for a separate VM deployment.
+
+## B. No-OBS relay deployment summary
+
+1. Create/prepare a Linux server or free-tier VM.
+2. Point a subdomain to it, for example:
+
+```text
+live.yourdomain.com
+```
+
+3. SSH to the server and install Docker.
+4. Upload or clone the repository.
+5. Run:
+
+```bash
+cd relay/no-obs-social-relay
+cp .env.example .env
+nano .env
+```
+
+6. Fill:
+
+```text
+DOMAIN=live.yourdomain.com
+RELAY_SECRET=your-long-private-secret
+PUBLIC_IP=your-server-public-ip
+```
+
+7. Start:
+
+```bash
+docker compose up -d --build
+```
+
+8. Test:
+
+```bash
+curl https://live.yourdomain.com/health
+```
+
+9. On the tablet:
+
+```text
+teach.html → ⚙ Settings → 📡 Tablet Live
+```
+
+10. Paste the gateway and social RTMP/RTMPS URLs, then start.
+
+## C. SEO verification
+
+After deployment, verify:
+
+```text
+https://your-site/sitemap.xml
+https://your-site/robots.txt
+```
+
+Then submit the sitemap to Google Search Console if you want faster indexing.
+
+---
+
+# ClassDesk v3 deployment addendum — subscription security and PiP
+
+## 1. Static app deployment
+
+Upload the contents of `classdesk v3/` to the repository root. Confirm these new v3 files are included:
+
+```text
+js/security-config.js
+security/license-gateway-worker/
+docs/CLASSDESK_V3_SECURITY_PIP_REPORT.md
+```
+
+## 2. Deploy the optional license gateway for strongest subscription protection
+
+A static app can be bypassed by a determined attacker if all subscription logic is only in JavaScript. To protect subscriptions on your official platform, deploy the Cloudflare Worker gateway.
+
+```bash
+cd security/license-gateway-worker
+npm install -g wrangler
+wrangler login
+wrangler kv namespace create LICENSE_KV
+cp wrangler.toml.example wrangler.toml
+# paste the KV id into wrangler.toml
+wrangler secret put ADMIN_SECRET
+wrangler deploy
+```
+
+Copy the Worker URL and edit:
+
+```text
+js/security-config.js
+```
+
+Set:
+
+```js
+window.HMG_SECURITY = {
+  licenseGateway: "https://YOUR-WORKER.workers.dev",
+  licenseMode: "strict",
+  leaseMinutes: 30,
+  heartbeatMinutes: 5
+};
+```
+
+## 3. Add a teacher license
+
+```bash
+curl -X POST https://YOUR-WORKER/api/admin/license \
+  -H "content-type: application/json" \
+  -H "x-admin-secret: YOUR_ADMIN_SECRET" \
+  -d '{"key":"HMG-202612-ABCDEF1234","email":"teacher@example.com","name":"Teacher Name","expires":"2026-12-31","devices":2,"plan":"teacher","status":"active"}'
+```
+
+## 4. Block a teacher/account
+
+```bash
+curl -X POST https://YOUR-WORKER/api/admin/block \
+  -H "content-type: application/json" \
+  -H "x-admin-secret: YOUR_ADMIN_SECRET" \
+  -d '{"email":"teacher@example.com","reason":"abuse/refund"}'
+```
+
+## 5. Picture-in-Picture use
+
+No special deployment is required. Teachers tap `▣ PiP` before minimising or switching apps. Browser support varies; Chrome/Edge are recommended.
