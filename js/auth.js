@@ -27,6 +27,9 @@
 
 const AUTH_SECRET = "CHANGE-ME-HMG-2026";   /* ← set your own private phrase */
 const TRIAL_DAYS = 3;
+const HMG_SECURITY_CFG = window.HMG_SECURITY || {};
+const LICENSE_GATEWAY = String(HMG_SECURITY_CFG.licenseGateway || "").replace(/\/+$/, "");
+const LICENSE_MODE = HMG_SECURITY_CFG.licenseMode || "hybrid"; // hybrid | strict
 
 async function sha256Hex(str) {
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
@@ -68,7 +71,8 @@ async function signupTeacher() {
   if (name.length < 3) return err("Enter your full name.");
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return err("Enter a valid email address.");
   if (phone.length < 7) return err("Enter a valid phone number (for your access key delivery).");
-  if (pw.length < 6) return err("Password must be at least 6 characters.");
+  if (pw.length < 8) return err("Password must be at least 8 characters.");
+  if (!/[A-Za-z]/.test(pw) || !/\d/.test(pw)) return err("Use letters and numbers in your password.");
   if (pw !== pw2) return err("Passwords do not match.");
   const salt = randomCode(10);
   const hash = await pbkdf2Hex(pw, salt);                       /* v7: key-stretched */
@@ -83,6 +87,7 @@ async function signupTeacher() {
 }
 
 async function loginTeacher() {
+  if (authLockedOut()) { $("#liStatus").textContent = "Too many failed attempts. Wait a few minutes and try again."; return; }
   const email = $("#liEmail").value.trim().toLowerCase();
   const pw = $("#liPw").value;
   const acc = await getAccount();
@@ -90,7 +95,8 @@ async function loginTeacher() {
   if (acc.email !== email) { $("#liStatus").textContent = "Email does not match the registered account."; return; }
   const hash = acc.kdf === 2 ? await pbkdf2Hex(pw, acc.salt)
                              : await sha256Hex(acc.salt + "|" + pw + "|" + AUTH_SECRET);
-  if (hash !== acc.hash) { $("#liStatus").textContent = "Incorrect password."; return; }
+  if (hash !== acc.hash) { noteFailedLogin(); $("#liStatus").textContent = "Incorrect password."; return; }
+  clearFailedLogin();
   sessionStorage.setItem("hmg_session", "1");
   $("#liStatus").textContent = "";
   toast("Welcome back, " + acc.name + "!", "ok");
@@ -110,6 +116,63 @@ async function activateLicense() {
   toast("🎉 License active until " + v.expiry + ". Thank you, " + acc.name + "!", "ok", 6000);
   finishAuth();
 }
+
+
+/* ---------- v3 optional online license gateway (Cloudflare Worker/free tier) ---------- */
+async function gatewayVerify(acc, lic, reason) {
+  if (!LICENSE_GATEWAY || !acc) return { ok: false, skipped: true };
+  try {
+    const r = await fetch(LICENSE_GATEWAY + "/api/verify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        app: "classdeck", reason: reason || "access", name: acc.name, email: acc.email,
+        phone: acc.phone || "", school: acc.school || "", device: deviceId(),
+        licenseKey: lic && lic.key ? lic.key : "", localCreated: acc.created || 0,
+        version: (window.HMG_VERSION || "classdesk-v3")
+      }),
+      cache: "no-store"
+    });
+    const out = await r.json().catch(() => ({}));
+    if (!r.ok || !out.ok) return { ok: false, why: out.why || ("Gateway rejected access (" + r.status + ")") };
+    const lease = { exp: Date.now() + Math.max(5, Number(out.leaseMinutes || HMG_SECURITY_CFG.leaseMinutes || 30)) * 60000,
+      badge: out.badge || "✓ online entitlement", plan: out.plan || "teacher", token: out.lease || "" };
+    Store.set("licenseLease", lease);
+    return { ok: true, lease, badge: lease.badge };
+  } catch (e) {
+    return { ok: false, offline: true, why: "License gateway unreachable: " + e.message };
+  }
+}
+function validLease() {
+  const l = Store.get("licenseLease", null);
+  return l && Number(l.exp || 0) > Date.now();
+}
+let _entRefreshTimer = null;
+function startEntitlementRefresh(acc) {
+  if (!LICENSE_GATEWAY || _entRefreshTimer) return;
+  const mins = Math.max(1, Number(HMG_SECURITY_CFG.heartbeatMinutes || 5));
+  _entRefreshTimer = setInterval(async () => {
+    const lic = Store.get("license", null);
+    const res = await gatewayVerify(acc, lic, "heartbeat");
+    if (!res.ok && LICENSE_MODE === "strict") {
+      Store.set("licenseLease", null);
+      window.HMG_AUTH_OK = false;
+      try { if (typeof endLive === "function" && window.room) endLive(); } catch {}
+      requireTeacherAccess();
+    }
+  }, mins * 60000);
+}
+function authLockedOut() {
+  const f = Store.get("auth_fail", { n: 0, until: 0 });
+  return Number(f.until || 0) > Date.now();
+}
+function noteFailedLogin() {
+  const f = Store.get("auth_fail", { n: 0, until: 0 });
+  f.n = Number(f.n || 0) + 1;
+  if (f.n >= 5) f.until = Date.now() + Math.min(30, f.n * 3) * 60000;
+  Store.set("auth_fail", f);
+}
+function clearFailedLogin() { Store.set("auth_fail", { n: 0, until: 0 }); }
 
 /* ---------- gate logic ---------- */
 window.HMG_AUTH_OK = false;
@@ -156,6 +219,15 @@ async function requireTeacherAccess() {
     switchAuthTab("license");
     $("#authStatus").textContent = "❌ " + why;
     return false;
+  }
+  if (LICENSE_GATEWAY) {
+    const gw = await gatewayVerify(acc, lic, "access");
+    if (gw.ok) { _authPass(acc, gw.badge || ("✓ " + acc.name + " · online entitlement")); startEntitlementRefresh(acc); return true; }
+    if (LICENSE_MODE === "strict") {
+      gate.classList.remove("hide"); switchAuthTab("license");
+      $("#authStatus").textContent = "❌ " + (gw.why || "Online subscription verification required.");
+      return false;
+    }
   }
   if (lic) {
     const v = await validateKey(acc.name, lic.key);
@@ -263,4 +335,8 @@ async function isRevoked(acc, lic) {
 }
 
 /* runtime heartbeat used by the broadcaster */
-function authHeartbeat() { return window.HMG_AUTH_OK === true && !!sessionStorage.getItem("hmg_session"); }
+function authHeartbeat() {
+  if (!(window.HMG_AUTH_OK === true && !!sessionStorage.getItem("hmg_session"))) return false;
+  if (LICENSE_GATEWAY && LICENSE_MODE === "strict" && !validLease()) return false;
+  return true;
+}

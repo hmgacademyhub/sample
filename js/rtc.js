@@ -44,6 +44,7 @@ class TeacherRoom {
     this.waitingRoom = false;                         // v4: Zoom-style waiting room
     this.pending = new Map();                         // v4: peers awaiting admission
     this.pin = "";                                    // v3: optional room PIN
+    this.inviteToken = "";                            // v3 security: optional signed invite-token gate
     this.boardsOn = false;                            // v8: student whiteboards
     this.activity = null;                             // v8: open/cloud/exit activity
     this.groups = null;                               // v8: group assignments
@@ -83,6 +84,11 @@ class TeacherRoom {
         const meta = conn.metadata || {};
         if (this.pin && String(meta.pin || "") !== this.pin) {   // v3: PIN gate
           conn.send({ t: "rejected", reason: "Wrong class PIN. Ask your teacher for the correct PIN." });
+          setTimeout(() => conn.close(), 400);
+          return;
+        }
+        if (this.inviteToken && String(meta.tok || "") !== this.inviteToken) { // v3: secure invite links
+          conn.send({ t: "rejected", reason: "This class requires the secure invite link from your teacher." });
           setTimeout(() => conn.close(), 400);
           return;
         }
@@ -504,6 +510,7 @@ class StudentRoom {
     this.code = roomCode.toUpperCase().trim();
     this.name = name;
     this.pin = opts.pin || "";                       // v3: room PIN
+    this.tok = opts.tok || "";                       // v3: secure invite token
     this.onEvent = opts.onEvent || (() => {});
     this.peer = null;
     this.conn = null;
@@ -518,7 +525,7 @@ class StudentRoom {
       let settled = false;
       this.peer.on("open", () => {
         this.conn = this.peer.connect(RTC_PREFIX + this.code + "-host", {
-          reliable: true, metadata: { name: this.name, pin: this.pin }
+          reliable: true, metadata: { name: this.name, pin: this.pin, tok: this.tok }
         });
         const failT = setTimeout(() => {
           if (!settled) { settled = true; reject(new Error("Could not reach the class. Check the room code and that the teacher is live.")); }

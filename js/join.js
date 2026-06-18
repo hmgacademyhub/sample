@@ -38,7 +38,7 @@ async function join() {
   $("#btnJoin").disabled = true;
   $("#joinStatus").textContent = "Connecting to class…";
 
-  sRoom = new StudentRoom(code, name, { onEvent: onEvent, pin: $("#inPin").value.trim() });
+  sRoom = new StudentRoom(code, name, { onEvent: onEvent, pin: $("#inPin").value.trim(), tok: qs.get("tok") || "" });
   try {
     await sRoom.join();
     enterStage();
@@ -62,7 +62,7 @@ function startLobby(code, name, why) {
   window._wantWake = true; keepAwake(true);
   const tick = async () => {
     if (!lobbyOn) return;
-    sRoom = new StudentRoom(code, name, { onEvent: onEvent, pin: $("#inPin").value.trim() });
+    sRoom = new StudentRoom(code, name, { onEvent: onEvent, pin: $("#inPin").value.trim(), tok: qs.get("tok") || "" });
     try {
       await sRoom.join();
       lobbyOn = false;
@@ -479,7 +479,7 @@ async function attemptRejoin() {
   await new Promise((r) => setTimeout(r, Math.min(8000, 2000 + rejoinTries * 500)));
   try {
     try { sRoom && sRoom.leave(); } catch {}
-    sRoom = new StudentRoom(code, name, { onEvent: onEvent, pin: $("#inPin").value.trim() });
+    sRoom = new StudentRoom(code, name, { onEvent: onEvent, pin: $("#inPin").value.trim(), tok: qs.get("tok") || "" });
     await sRoom.join();
     rejoinTries = 0;
     hideRejoinBanner();

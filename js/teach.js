@@ -1222,9 +1222,16 @@ const roomCode = (() => {
 })();
 $("#roomCodeLbl").textContent = roomCode;
 
+function inviteToken() {
+  let t = Store.get("invite_token_" + roomCode, "");
+  if (!t) { t = randomCode(16); Store.set("invite_token_" + roomCode, t); }
+  return t;
+}
 function studentLink() {
   const base = location.href.replace(/teach\.html.*$/, "join.html");
-  return base + "?room=" + roomCode;
+  let url = base + "?room=" + roomCode;
+  if (Store.get("secure_invite", false)) url += "&tok=" + encodeURIComponent(inviteToken());
+  return url;
 }
 
 /* invite modal */
@@ -1276,6 +1283,7 @@ async function goLive() {
     room = new TeacherRoom(roomCode, { onEvent: onRoomEvent });
     room.roomName = Store.get("roomname", "") || ("Class " + roomCode);
     room.pin = Store.get("pin", "");
+    room.inviteToken = Store.get("secure_invite", false) ? inviteToken() : "";
     /* v6 (issue 1): teacher approval is the DEFAULT — students wait until admitted */
     room.waitingRoom = Store.get("waitroom", true);        /* v5 bug-fix: PIN applied atomically
                                                (was a setTimeout race in v4) */
@@ -1320,6 +1328,7 @@ async function goLive() {
     window._wantWake = Store.get("wake", true);
     if (window._wantWake) keepAwake(true);
     Store.set("wasLive", true);   /* v5 (issue 3): remember we were live */
+    audit("go-live", "Class started");
     toast("You are LIVE. Share the invite link with students.", "ok", 5000);
   } catch (e) {
     toast(e.message || "Could not start class", "err", 6000);
@@ -1404,6 +1413,7 @@ function endLive() {
   $("#stuCount").textContent = "0 👥";
   room = null;
   window._wantWake = false; keepAwake(false);
+  audit("end-live", "Class ended");
   toast("Class ended. Attendance is available in the Students drawer until you reload.");
 }
 
@@ -1868,6 +1878,9 @@ $("#btnSettings").addEventListener("click", () => {
   $("#setBroadcast").value = Store.get("broadcast", "composite");
   $("#setQuality").value = Store.get("quality", "1280x720x8");
   $("#setWake").checked = Store.get("wake", true);
+  if ($("#setSecureInvite")) $("#setSecureInvite").checked = Store.get("secure_invite", false);
+  if ($("#setWatermark")) $("#setWatermark").checked = Store.get("security_watermark", true);
+  if ($("#setAutoPiP")) $("#setAutoPiP").checked = Store.get("auto_pip_reminder", false);
   $("#setNewRoom").checked = false;
   openModal("#mSettings");
 });
@@ -1877,6 +1890,9 @@ $("#setSave").addEventListener("click", () => {
   Store.set("broadcast", $("#setBroadcast").value);
   Store.set("quality", $("#setQuality").value);
   Store.set("wake", $("#setWake").checked);
+  if ($("#setSecureInvite")) Store.set("secure_invite", $("#setSecureInvite").checked);
+  if ($("#setWatermark")) Store.set("security_watermark", $("#setWatermark").checked);
+  if ($("#setAutoPiP")) Store.set("auto_pip_reminder", $("#setAutoPiP").checked);
   if ($("#setNewRoom").checked) Store.set("newroom", true);
   setQuality($("#setQuality").value);
   closeModal("#mSettings");
@@ -2558,6 +2574,9 @@ $("#reportDownload").addEventListener("click", () => {
     $("#setPin").value = Store.get("pin", "");
     $("#setBrand").value = Store.get("brand", "HMG ACADEMY CLASS DECK");
     $("#setAccent").value = Store.get("accent", "#ffb347");
+    if ($("#setSecureInvite")) $("#setSecureInvite").checked = Store.get("secure_invite", false);
+    if ($("#setWatermark")) $("#setWatermark").checked = Store.get("security_watermark", true);
+    if ($("#setAutoPiP")) $("#setAutoPiP").checked = Store.get("auto_pip_reminder", false);
   });
   $("#setSave").addEventListener("click", () => {
     const pin = $("#setPin").value.trim();
@@ -2567,6 +2586,9 @@ $("#reportDownload").addEventListener("click", () => {
     Store.set("brand", brand);
     const accent = $("#setAccent").value;
     Store.set("accent", accent);
+    if ($("#setSecureInvite")) Store.set("secure_invite", $("#setSecureInvite").checked);
+    if ($("#setWatermark")) Store.set("security_watermark", $("#setWatermark").checked);
+    if ($("#setAutoPiP")) Store.set("auto_pip_reminder", $("#setAutoPiP").checked);
     applyBranding();
   });
   $("#setAccentReset").addEventListener("click", () => { $("#setAccent").value = "#ffb347"; });
@@ -2817,6 +2839,197 @@ if ($("#noiseThreshold")) $("#noiseThreshold").addEventListener("input", (e) => 
 const _drawCompositeBeforeNoise = drawComposite;
 drawComposite = function () { _drawCompositeBeforeNoise(); if (noiseOn) drawNoiseOverlay(COMP.ctx, COMP.w, COMP.h); };
 
+
+/* ------------------------------------------------------------
+   v10 / ClassDesk v2: Direct tablet social live (NO OBS)
+   Browser reality: RTMP/RTMPS cannot be opened directly from a static web page.
+   This module publishes the ClassDeck composite MediaStream to a WebRTC WHIP
+   relay (included in relay/no-obs-social-relay). The relay converts to RTMP.
+   ------------------------------------------------------------ */
+let tabletLive = { pc: null, stream: null, resource: "", gateway: "", streamName: "classdeck", format: "landscape", raf: null, canvas: null };
+function tlSetStatus(msg, ok) {
+  const el = $("#tlStatus"); if (el) { el.textContent = msg; el.style.color = ok ? "var(--ok)" : "var(--text-dim)"; }
+}
+function normaliseGateway(u) { return String(u || "").trim().replace(/\/+$/, ""); }
+function tlLoadSettings() {
+  const saved = Store.get("tablet_live", {});
+  $("#tlGateway").value = saved.gateway || "";
+  $("#tlSecret").value = saved.secret || "";
+  $("#tlStream").value = saved.stream || ("classdeck-" + roomCode.toLowerCase());
+  $("#tlFormat").value = saved.format || "landscape";
+  $$(".tlDest").forEach((inp) => { inp.value = (saved.destinations && saved.destinations[inp.dataset.name]) || ""; });
+}
+function tlReadSettings() {
+  const destinations = {};
+  $$(".tlDest").forEach((inp) => { if (inp.value.trim()) destinations[inp.dataset.name] = inp.value.trim(); });
+  const out = {
+    gateway: normaliseGateway($("#tlGateway").value),
+    secret: $("#tlSecret").value.trim(),
+    stream: ($("#tlStream").value.trim() || ("classdeck-" + roomCode.toLowerCase())).replace(/[^a-zA-Z0-9_-]/g, "-"),
+    format: $("#tlFormat").value,
+    destinations
+  };
+  if ($("#tlRemember") && $("#tlRemember").checked) Store.set("tablet_live", out);
+  else Store.set("tablet_live", { gateway: out.gateway, stream: out.stream, format: out.format });
+  return out;
+}
+function ensureCompositeForSocial() {
+  if (!COMP.raf) { drawComposite(); COMP.raf = requestAnimationFrame(compositeLoop); }
+}
+function createVerticalSocialStream(fps) {
+  tabletLive.canvas = document.createElement("canvas");
+  tabletLive.canvas.width = 720; tabletLive.canvas.height = 1280;
+  const ctx = tabletLive.canvas.getContext("2d");
+  const brand = Store.get("brand", "HMG ACADEMY CLASS DECK");
+  const draw = () => {
+    tabletLive.raf = requestAnimationFrame(draw);
+    try { drawComposite(); } catch {}
+    ctx.fillStyle = "#10142b"; ctx.fillRect(0, 0, 720, 1280);
+    ctx.fillStyle = "#ffb347"; ctx.font = "bold 28px system-ui"; ctx.textAlign = "center";
+    ctx.fillText(brand, 360, 54, 660);
+    const s = Math.min(680 / COMP.canvas.width, 860 / COMP.canvas.height);
+    const dw = COMP.canvas.width * s, dh = COMP.canvas.height * s;
+    const dx = (720 - dw) / 2, dy = 92;
+    ctx.fillStyle = "#000"; ctx.fillRect(dx - 4, dy - 4, dw + 8, dh + 8);
+    ctx.drawImage(COMP.canvas, dx, dy, dw, dh);
+    const selfVid = $("#selfVideo");
+    if (camOn && selfVid && selfVid.videoWidth) {
+      const pw = 230, ph = 170, px = 720 - pw - 30, py = dy + dh + 22;
+      ctx.save(); ctx.beginPath(); ctx.roundRect(px, py, pw, ph, 18); ctx.clip();
+      ctx.translate(px + pw, py); ctx.scale(-1, 1); ctx.drawImage(selfVid, 0, 0, pw, ph); ctx.restore();
+      ctx.strokeStyle = "#ffb347"; ctx.lineWidth = 4; ctx.beginPath(); ctx.roundRect(px, py, pw, ph, 18); ctx.stroke();
+    }
+    ctx.fillStyle = "#eef1ff"; ctx.font = "22px system-ui"; ctx.textAlign = "left";
+    ctx.fillText("Live class with Adewale Samson Adeagbo", 32, 1070, 656);
+    ctx.fillStyle = "#9aa3cf"; ctx.font = "17px system-ui";
+    ctx.fillText("HMG Academy · HMG Concepts · Lagos, Nigeria", 32, 1102, 656);
+    ctx.fillStyle = "rgba(255,255,255,.08)"; ctx.fillRect(32, 1140, 656, 1);
+    ctx.fillStyle = "#ffb347"; ctx.font = "bold 18px system-ui"; ctx.textAlign = "center";
+    ctx.fillText("Learning Deliberately. Teaching Authentically.", 360, 1194, 650);
+  };
+  draw();
+  return tabletLive.canvas.captureStream(fps);
+}
+async function buildTabletLiveStream(format) {
+  ensureCompositeForSocial();
+  const fps = Math.max(10, COMP.fps || 10);
+  let videoStream;
+  if (format === "vertical") videoStream = createVerticalSocialStream(fps);
+  else {
+    drawComposite();
+    videoStream = COMP.canvas.captureStream(fps);
+  }
+  const out = new MediaStream(videoStream.getVideoTracks());
+  await ensureMic(true);
+  if (micStream) micStream.getAudioTracks().forEach((t) => out.addTrack(t));
+  return out;
+}
+function waitForIceComplete(pc) {
+  if (pc.iceGatheringState === "complete") return Promise.resolve();
+  return new Promise((resolve) => {
+    const done = () => { if (pc.iceGatheringState === "complete") { pc.removeEventListener("icegatheringstatechange", done); resolve(); } };
+    pc.addEventListener("icegatheringstatechange", done);
+    setTimeout(resolve, 2500); // Trickle-less WHIP fallback: don't hang forever.
+  });
+}
+async function publishWhip(stream, gateway, streamName) {
+  const endpoint = gateway + "/rtc/v1/whip/?app=live&stream=" + encodeURIComponent(streamName);
+  const pc = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
+  stream.getTracks().forEach((track) => pc.addTrack(track, stream));
+  await pc.setLocalDescription(await pc.createOffer());
+  await waitForIceComplete(pc);
+  const res = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/sdp" }, body: pc.localDescription.sdp });
+  if (!res.ok) throw new Error("WHIP publish failed (" + res.status + "). Check relay HTTPS/CORS and SRS status.");
+  const answer = await res.text();
+  await pc.setRemoteDescription({ type: "answer", sdp: answer });
+  tabletLive.resource = res.headers.get("Location") || "";
+  return pc;
+}
+async function relayStart(settings) {
+  const dest = Object.entries(settings.destinations || {}).map(([name, url]) => ({ name, publishUrl: url }));
+  if (!dest.length) return;
+  const res = await fetch(settings.gateway + "/api/start", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-relay-secret": settings.secret || "" },
+    body: JSON.stringify({ stream: settings.stream, format: settings.format, destinations: dest })
+  });
+  if (!res.ok) throw new Error("Relay destination start failed (" + res.status + ")");
+}
+async function relayStop() {
+  if (!tabletLive.gateway) return;
+  try {
+    const secret = ($("#tlSecret") && $("#tlSecret").value.trim()) || (Store.get("tablet_live", {}).secret || "");
+    await fetch(tabletLive.gateway + "/api/stop", { method: "POST", headers: { "Content-Type": "application/json", "x-relay-secret": secret }, body: JSON.stringify({ stream: tabletLive.streamName }) });
+  } catch {}
+}
+async function startTabletSocialLive() {
+  const settings = tlReadSettings();
+  if (!settings.gateway) { toast("Enter your relay gateway URL first", "err"); return; }
+  if (tabletLive.pc) { toast("Tablet social live is already running"); return; }
+  try {
+    tlSetStatus("Preparing ClassDeck stream from this tablet…");
+    tabletLive.gateway = settings.gateway; tabletLive.streamName = settings.stream; tabletLive.format = settings.format;
+    tabletLive.stream = await buildTabletLiveStream(settings.format);
+    tlSetStatus("Connecting to WebRTC relay…");
+    tabletLive.pc = await publishWhip(tabletLive.stream, settings.gateway, settings.stream);
+    tlSetStatus("Starting social destinations…");
+    await relayStart(settings);
+    $("#tlStart").classList.add("active");
+    tlSetStatus("LIVE through relay: " + settings.stream + " → " + Object.keys(settings.destinations).join(", "), true);
+    toast("📡 Tablet Social Live started — no OBS", "ok", 7000);
+  } catch (e) {
+    await stopTabletSocialLive(true);
+    tlSetStatus("Could not start: " + e.message);
+    toast("Tablet Social Live failed: " + e.message, "err", 8000);
+  }
+}
+async function stopTabletSocialLive(silent) {
+  await relayStop();
+  try {
+    if (tabletLive.resource) await fetch(tabletLive.resource, { method: "DELETE" });
+  } catch {}
+  try { tabletLive.pc && tabletLive.pc.close(); } catch {}
+  if (tabletLive.raf) cancelAnimationFrame(tabletLive.raf);
+  try { tabletLive.stream && tabletLive.stream.getVideoTracks().forEach((t) => t.stop()); } catch {}
+  tabletLive = { pc: null, stream: null, resource: "", gateway: tabletLive.gateway, streamName: tabletLive.streamName, format: tabletLive.format, raf: null, canvas: null };
+  $("#tlStart")?.classList.remove("active");
+  tlSetStatus("Tablet Social Live stopped.");
+  if (!silent) toast("📡 Tablet Social Live stopped");
+}
+async function checkRelayHealth() {
+  const settings = tlReadSettings();
+  if (!settings.gateway) { toast("Enter gateway URL first", "err"); return; }
+  try {
+    const res = await fetch(settings.gateway + "/health", { headers: { "x-relay-secret": settings.secret || "" } });
+    const text = await res.text();
+    tlSetStatus(res.ok ? ("Relay OK: " + text.slice(0, 120)) : ("Relay replied " + res.status));
+    toast(res.ok ? "Relay is reachable" : "Relay health check failed", res.ok ? "ok" : "err");
+  } catch (e) { tlSetStatus("Relay not reachable: " + e.message); toast("Relay not reachable", "err"); }
+}
+async function tryFullTabletScreenShare() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+    toast("This tablet/browser does not expose full Android screen capture to web apps. ClassDeck will still share the full ClassDeck teaching workspace directly.", "err", 9000);
+    Store.set("broadcast", "composite");
+    return;
+  }
+  try {
+    const s = await navigator.mediaDevices.getDisplayMedia({ video: { frameRate: { ideal: COMP.fps || 10 } }, audio: true });
+    if (!room) { s.getTracks().forEach((t) => t.stop()); Store.set("broadcast", "screen"); toast("Full screen sharing is supported. Tap ▶ Go Live to choose your screen.", "ok", 7000); return; }
+    if (stageStream) stageStream.getVideoTracks().forEach((t) => t.stop());
+    stageStream = s;
+    if (micStream) micStream.getAudioTracks().forEach((t) => stageStream.addTrack(t));
+    room.setStageStream(stageStream);
+    toast("🖥 Full screen is now being shared to ClassDeck students", "ok", 7000);
+    s.getVideoTracks()[0].addEventListener("ended", () => { toast("Full screen share ended — switching back to ClassDeck workspace", "err"); startCompositeStage(); });
+  } catch (e) { toast("Screen share cancelled/unavailable. Using ClassDeck workspace broadcast.", "err", 6000); }
+}
+if ($("#btnTabletLive")) $("#btnTabletLive").addEventListener("click", () => { tlLoadSettings(); openModal("#mTabletLive"); });
+if ($("#tlStart")) $("#tlStart").addEventListener("click", startTabletSocialLive);
+if ($("#tlStop")) $("#tlStop").addEventListener("click", () => stopTabletSocialLive(false));
+if ($("#tlHealth")) $("#tlHealth").addEventListener("click", checkRelayHealth);
+if ($("#tlOpenCentre")) $("#tlOpenCentre").addEventListener("click", openStreamCentre);
+if ($("#btnTryScreenShare")) $("#btnTryScreenShare").addEventListener("click", tryFullTabletScreenShare);
+
 /* Free speech-to-text captions: browser Web Speech API only (no paid AI/API). */
 let capRec = null, capOn = false, capLines = [];
 function captionEngine() { return window.SpeechRecognition || window.webkitSpeechRecognition || null; }
@@ -2875,6 +3088,98 @@ if ($("#btnTranscript")) $("#btnTranscript").addEventListener("click", () => {
   const body = capLines.length ? capLines.map((l) => "[" + l.time + "] " + l.text).join("\n") : "No caption transcript yet.";
   downloadBlob(new Blob([body], { type: "text/plain" }), "classdeck-caption-transcript-" + roomCode + "-" + Date.now() + ".txt");
 });
+
+
+/* ------------------------------------------------------------
+   ClassDesk v3: Enterprise security controls + Picture-in-Picture continuity
+   ------------------------------------------------------------ */
+const securityAudit = Store.get("security_audit", []);
+function audit(event, detail) {
+  const row = { time: nowStamp(), event, detail: String(detail || "").slice(0, 240), room: roomCode, device: Store.get("device_id", "") };
+  securityAudit.push(row);
+  while (securityAudit.length > 500) securityAudit.shift();
+  Store.set("security_audit", securityAudit);
+}
+function auditCSV() {
+  const rows = [["Time", "Event", "Detail", "Room", "Device"], ...securityAudit.map((r) => [r.time, r.event, r.detail, r.room, r.device])];
+  return rows.map((r) => r.map((c) => '"' + String(c).replace(/"/g, '""') + '"').join(",")).join("\n");
+}
+if ($("#btnAuditCSV")) $("#btnAuditCSV").addEventListener("click", () => {
+  downloadBlob(new Blob([auditCSV()], { type: "text/csv" }), "classdeck-security-audit-" + roomCode + "-" + Date.now() + ".csv");
+});
+
+/* Forensic watermark: deters screen-recording/reselling by stamping teacher, room and device. */
+function drawForensicWatermark(ctx, W, H) {
+  if (!Store.get("security_watermark", true)) return;
+  const acc = Store.get("account", null) || {};
+  const text = ((acc.email || acc.name || "licensed teacher") + " · room " + roomCode + " · " + new Date().toLocaleString()).slice(0, 120);
+  ctx.save();
+  ctx.globalAlpha = 0.11;
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "bold " + Math.max(16, Math.round(W / 42)) + "px system-ui, sans-serif";
+  ctx.translate(W / 2, H / 2); ctx.rotate(-Math.PI / 7); ctx.textAlign = "center";
+  for (let y = -H; y <= H; y += 120) ctx.fillText(text, 0, y, W * 1.3);
+  ctx.restore();
+}
+const _drawCompositeBeforeSecurityWatermark = drawComposite;
+drawComposite = function () { _drawCompositeBeforeSecurityWatermark(); drawForensicWatermark(COMP.ctx, COMP.w, COMP.h); };
+
+/* PiP continuity: the browser requires a user gesture; once started, the app
+   keeps a small live preview when the teacher switches/minimises. */
+let pipVideo = null, pipStream = null, pipPump = null, pipActive = false;
+function ensurePipVideo() {
+  if (pipVideo) return pipVideo;
+  pipVideo = document.createElement("video");
+  pipVideo.playsInline = true; pipVideo.muted = true; pipVideo.autoplay = true;
+  pipVideo.style.cssText = "position:fixed;width:1px;height:1px;opacity:.01;pointer-events:none;left:-5px;bottom:-5px";
+  document.body.appendChild(pipVideo);
+  return pipVideo;
+}
+function startPipPump() {
+  if (pipPump) return;
+  pipPump = setInterval(() => { try { drawComposite(); } catch {} }, Math.max(250, 1000 / Math.max(1, COMP.fps || 4)));
+}
+function stopPipPumpIfSafe() { if (pipPump && !pipActive && !document.hidden) { clearInterval(pipPump); pipPump = null; } }
+async function enterClassDeckPiP() {
+  if (!document.pictureInPictureEnabled) { toast("Picture-in-picture is not supported in this browser.", "err", 7000); return; }
+  ensureCompositeForSocial && ensureCompositeForSocial();
+  drawComposite();
+  const v = ensurePipVideo();
+  if (!pipStream) {
+    pipStream = new MediaStream(COMP.canvas.captureStream(Math.max(4, COMP.fps || 8)).getVideoTracks());
+  }
+  v.srcObject = pipStream;
+  await v.play().catch(() => {});
+  try {
+    await v.requestPictureInPicture();
+    pipActive = true; startPipPump();
+    if ("mediaSession" in navigator) {
+      navigator.mediaSession.metadata = new MediaMetadata({ title: "HMG ClassDeck live lesson", artist: "Adewale Samson Adeagbo · HMG Academy" });
+    }
+    $("#btnPiP")?.classList.add("active");
+    audit("pip-start", "Teacher started Picture-in-Picture continuity preview");
+    toast("▣ PiP active — keep this small window open while switching/minimising.", "ok", 7000);
+  } catch (e) { toast("PiP could not start: " + e.message, "err", 6000); }
+}
+async function exitClassDeckPiP() {
+  try { if (document.pictureInPictureElement) await document.exitPictureInPicture(); } catch {}
+}
+if ($("#btnPiP")) $("#btnPiP").addEventListener("click", () => document.pictureInPictureElement ? exitClassDeckPiP() : enterClassDeckPiP());
+document.addEventListener("leavepictureinpicture", () => { pipActive = false; $("#btnPiP")?.classList.remove("active"); stopPipPumpIfSafe(); audit("pip-stop", "PiP closed"); });
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && (room || Store.get("wasLive", false))) {
+    startPipPump();
+    if (Store.get("auto_pip_reminder", false) && !pipActive) toast("Tip: tap ▣ PiP before minimising to keep the lesson visible.", "", 6000);
+  } else stopPipPumpIfSafe();
+});
+
+/* Security event hooks */
+audit("studio-open", location.href);
+const _securityOnRoomEvent = onRoomEvent;
+onRoomEvent = function (type, p) {
+  _securityOnRoomEvent(type, p);
+  if (["student-joined", "student-left", "waiting", "student-media", "student-media-end"].includes(type)) audit(type, p && (p.name || p.peerId || p.kind));
+};
 
 /* ------------------------------------------------------------
    v3.6 Keyboard shortcuts (USB/Bluetooth keyboard friendly)
