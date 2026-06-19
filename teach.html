@@ -142,6 +142,9 @@
         <option value="plain">Plain</option>
         <option value="grid">Grid</option>
         <option value="ruled">Ruled</option>
+        <option value="handwriting">Nursery handwriting lines</option>
+        <option value="fourline">4-line letter practice</option>
+        <option value="graphpaper">Fine graph paper</option>
         <option value="dark">Dark board</option>
       </select>
       <button class="tool wb-export" title="Export page as PNG">⬇</button>
@@ -301,6 +304,17 @@
       <button class="btn small primary gr-plot">Plot</button>
       <button class="btn small gr-add" title="Add as second curve">+ curve</button>
       <button class="btn small gr-clear">Clear</button>
+      <select class="input gr-preset" style="width:auto;padding:5px" title="Quick graph examples">
+        <option value="">Examples</option>
+        <option value="2*x+1">Linear</option>
+        <option value="x^2-4">Quadratic</option>
+        <option value="x^3-3*x">Cubic</option>
+        <option value="sin(x)">Sine wave</option>
+        <option value="abs(x)">Absolute value</option>
+        <option value="sqrt(x)">Square-root</option>
+        <option value="log(x)">Logarithmic</option>
+        <option value="exp(x/3)">Exponential</option>
+      </select>
       <button class="btn small gr-zo">−</button>
       <button class="btn small gr-zi">＋</button>
       <select class="input gr-bg" style="width:auto;padding:5px" title="Background — improve visibility for students">
@@ -363,7 +377,7 @@
           <option value="letters">🅰 Letter formation</option>
           <option value="noise">🔊 Noise meter</option>
         </optgroup>
-        <optgroup label="Library (161 reference cards)">
+        <optgroup label="Library (180+ reference cards)">
           <option value="cards">📇 Reference library — Maths · Science · English · Social · ICT</option>
         </optgroup>
       </select>
@@ -993,6 +1007,7 @@ Not sure</textarea>
 <script src="js/toolkit.js"></script>
 <script src="js/toolkit-data.js"></script>
 <script src="js/toolkit-data2.js"></script>
+<script src="js/toolkit-data3.js"></script>
 <script src="js/toolkit-ext.js"></script>
 <script src="js/security-config.js"></script>
 <script src="js/auth.js"></script>
