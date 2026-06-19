@@ -105,6 +105,9 @@ function enterStage() {
 function onEvent(type, p) {
   switch (type) {
     case "welcome":
+      Store.set("joined_" + (sRoom ? sRoom.code : $("#inRoom").value.trim().toUpperCase()), true);
+      closeModal("#mWaiting");
+      if ($("#joinGate")) $("#joinGate").classList.add("hide");
       $("#roomNameChip").textContent = p.roomName || "";
       $("#countChip").textContent = "👥 " + (p.count || 1);
       toast("Joined! Waiting for the teacher's screen…", "ok");
@@ -169,6 +172,7 @@ function onEvent(type, p) {
       cleanupAndGate(p.reason || "The room is locked.");
       break;
     case "classEnded":
+      Store.set("joined_" + (sRoom ? sRoom.code : $("#inRoom").value.trim().toUpperCase()), false);
       cleanupAndGate("Class has ended. Thanks for attending! 🎓");
       break;
     case "disconnected":
@@ -351,7 +355,7 @@ async function toggleMyMic() {
 
 $("#sBtnFull").addEventListener("click", toggleFullscreen);
 $("#sBtnLeave").addEventListener("click", () => {
-  if (confirm("Leave the class?")) { sRoom.leave(); cleanupAndGate("You left the class."); }
+  if (confirm("Leave the class?")) { Store.set("joined_" + (sRoom ? sRoom.code : $("#inRoom").value.trim().toUpperCase()), false); sRoom.leave(); cleanupAndGate("You left the class."); }
 });
 
 /* ---------- polls ---------- */

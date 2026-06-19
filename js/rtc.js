@@ -42,6 +42,7 @@ class TeacherRoom {
     this.peer = null;
     this.locked = false;
     this.waitingRoom = false;                         // v4: Zoom-style waiting room
+    this.autoAdmitRejoin = false;                    // enterprise: let previously admitted students re-enter after teacher resume
     this.pending = new Map();                         // v4: peers awaiting admission
     this.pin = "";                                    // v3: optional room PIN
     this.inviteToken = "";                            // v3 security: optional signed invite-token gate
@@ -93,8 +94,10 @@ class TeacherRoom {
           return;
         }
         const name = (meta.name || "Student").slice(0, 40);
-        /* v4: waiting room — hold the student until the teacher admits */
-        if (this.waitingRoom) {
+        const isRejoin = !!meta.rejoin;
+        /* Enterprise resume fix: when the teacher accidentally leaves and resumes the SAME room,
+           students that were already inside auto-reconnect instead of being trapped in the lobby. */
+        if (this.waitingRoom && !(this.autoAdmitRejoin && isRejoin)) {
           this.pending.set(conn.peer, { conn, name });
           conn.send({ t: "waiting" });
           this.onEvent("waiting", { peerId: conn.peer, name });
@@ -126,7 +129,7 @@ class TeacherRoom {
     this.attendance.push({ name, event: "joined", time: nowStamp() });
     this.stats.joins++;
     this.stats.peak = Math.max(this.stats.peak, this.students.size);
-    conn.send({ t: "welcome", roomName: this.roomName || this.code, count: this.students.size });
+    conn.send({ t: "welcome", roomName: this.roomName || this.code, count: this.students.size, rejoined: !!(conn.metadata && conn.metadata.rejoin) });
     this._broadcastRoster();
     this.onEvent("student-joined", { peerId: conn.peer, name });
     // push current stage + cam to the newcomer
@@ -525,7 +528,7 @@ class StudentRoom {
       let settled = false;
       this.peer.on("open", () => {
         this.conn = this.peer.connect(RTC_PREFIX + this.code + "-host", {
-          reliable: true, metadata: { name: this.name, pin: this.pin, tok: this.tok }
+          reliable: true, metadata: { name: this.name, pin: this.pin, tok: this.tok, rejoin: Store.get("joined_" + this.code, false) }
         });
         const failT = setTimeout(() => {
           if (!settled) { settled = true; reject(new Error("Could not reach the class. Check the room code and that the teacher is live.")); }

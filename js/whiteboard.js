@@ -343,6 +343,29 @@ class Whiteboard {
       ctx.beginPath();
       for (let y = step; y < H; y += step) { ctx.moveTo(0, y); ctx.lineTo(W, y); }
       ctx.stroke();
+    } else if (this.bgStyle === "handwriting" || this.bgStyle === "fourline") {
+      const group = (this.bgStyle === "fourline" ? 72 : 84) * this.dpr;
+      const left = 56 * this.dpr;
+      ctx.strokeStyle = "rgba(224,43,43,.30)"; ctx.lineWidth = 1.5 * this.dpr;
+      ctx.beginPath(); ctx.moveTo(left, 0); ctx.lineTo(left, H); ctx.stroke();
+      for (let y = group * .8; y < H; y += group) {
+        ctx.strokeStyle = "rgba(21,101,216,.40)"; ctx.lineWidth = 1.2 * this.dpr;
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+        ctx.strokeStyle = "rgba(21,101,216,.20)"; ctx.lineWidth = 1 * this.dpr;
+        ctx.beginPath(); ctx.moveTo(0, y - group/3); ctx.lineTo(W, y - group/3); ctx.moveTo(0, y + group/3); ctx.lineTo(W, y + group/3);
+        if (this.bgStyle === "fourline") { ctx.moveTo(0, y - group/6); ctx.lineTo(W, y - group/6); }
+        ctx.stroke();
+      }
+    } else if (this.bgStyle === "graphpaper") {
+      const small = 12 * this.dpr, big = small * 5;
+      ctx.strokeStyle = "rgba(70,110,255,.10)"; ctx.lineWidth = 1; ctx.beginPath();
+      for (let x = small; x < W; x += small) { ctx.moveTo(x, 0); ctx.lineTo(x, H); }
+      for (let y = small; y < H; y += small) { ctx.moveTo(0, y); ctx.lineTo(W, y); }
+      ctx.stroke();
+      ctx.strokeStyle = "rgba(70,110,255,.24)"; ctx.beginPath();
+      for (let x = big; x < W; x += big) { ctx.moveTo(x, 0); ctx.lineTo(x, H); }
+      for (let y = big; y < H; y += big) { ctx.moveTo(0, y); ctx.lineTo(W, y); }
+      ctx.stroke();
     }
   }
   redraw() {

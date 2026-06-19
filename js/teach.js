@@ -814,6 +814,9 @@ function initGraph(side, inst) {
   $(".gr-zi", el).addEventListener("click", () => { view.w = Math.max(1, view.w / 1.4); draw(); });
   $(".gr-zo", el).addEventListener("click", () => { view.w = Math.min(200, view.w * 1.4); draw(); });
   /* v6 (issue 3): background selector */
+  const preset = $(".gr-preset", el);
+  if (preset) preset.addEventListener("change", (e) => { if (e.target.value) { $(".gr-fx", el).value = e.target.value; plot(false); e.target.value = ""; } });
+
   $(".gr-bg", el).value = grTheme;
   $(".gr-bg", el).addEventListener("change", (e) => {
     grTheme = e.target.value;
@@ -1285,7 +1288,9 @@ async function goLive() {
     room.pin = Store.get("pin", "");
     room.inviteToken = Store.get("secure_invite", false) ? inviteToken() : "";
     /* v6 (issue 1): teacher approval is the DEFAULT — students wait until admitted */
-    room.waitingRoom = Store.get("waitroom", true);        /* v5 bug-fix: PIN applied atomically
+    room.waitingRoom = Store.get("waitroom", true);
+    room.autoAdmitRejoin = Store.get("wasLive", false); // resume fix: previously admitted students bypass waiting room
+    /* v5 bug-fix: PIN applied atomically
                                                (was a setTimeout race in v4) */
     await room.start();
 
@@ -1328,6 +1333,7 @@ async function goLive() {
     window._wantWake = Store.get("wake", true);
     if (window._wantWake) keepAwake(true);
     Store.set("wasLive", true);   /* v5 (issue 3): remember we were live */
+    room.autoAdmitRejoin = true;
     audit("go-live", "Class started");
     toast("You are LIVE. Share the invite link with students.", "ok", 5000);
   } catch (e) {
@@ -1349,7 +1355,7 @@ function startCompositeStage() {
 async function ensureMic(on) {
   if (on && !micStream) {
     try {
-      micStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true }, video: false });
+      micStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1, sampleRate: { ideal: 48000 } }, video: false });
       micOn = true;
       if (stageStream) micStream.getAudioTracks().forEach((t) => stageStream.addTrack(t));
       $("#btnMic").classList.add("active");
@@ -1821,19 +1827,32 @@ async function startRecording() {
   await ensureMic(true);
   if (micStream) micStream.getAudioTracks().forEach((t) => recStream.addTrack(t));
   try {
-    const mime = MediaRecorder.isTypeSupported("video/webm;codecs=vp8,opus") ? "video/webm;codecs=vp8,opus" : "video/webm";
-    recorder = new MediaRecorder(recStream, { mimeType: mime, videoBitsPerSecond: 1_200_000 });
+    const candidates = [
+      "video/mp4;codecs=avc1.42E01E,mp4a.40.2", // Safari/new Chromium where available
+      "video/mp4",
+      "video/webm;codecs=vp9,opus",
+      "video/webm;codecs=vp8,opus",
+      "video/webm"
+    ];
+    const mime = candidates.find((m) => MediaRecorder.isTypeSupported(m)) || "";
+    recorder = new MediaRecorder(recStream, {
+      mimeType: mime || undefined,
+      videoBitsPerSecond: 2_500_000,
+      audioBitsPerSecond: 128_000
+    });
     recChunks = [];
     recorder.ondataavailable = (e) => { if (e.data.size) recChunks.push(e.data); };
     recorder.onstop = () => {
       const safe = (s) => s.replace(/[^\w\- ]+/g, "").trim().replace(/\s+/g, "-");
-      const fname = [safe(recMeta.brand || "Lesson"), safe(recMeta.subject || ""), safe(recMeta.topic || ""), safe(recMeta.klass || ""), new Date().toISOString().slice(0, 10)].filter(Boolean).join("_") + ".webm";
-      downloadBlob(new Blob(recChunks, { type: "video/webm" }), fname);
+      const outType = recorder.mimeType || mime || "video/webm";
+      const ext = outType.includes("mp4") ? ".mp4" : ".webm";
+      const fname = [safe(recMeta.brand || "Lesson"), safe(recMeta.subject || ""), safe(recMeta.topic || ""), safe(recMeta.klass || ""), new Date().toISOString().slice(0, 10)].filter(Boolean).join("_") + ext;
+      downloadBlob(new Blob(recChunks, { type: outType }), fname);
       recChunks = [];
     };
     recorder.start(2000);
     $("#btnRec").classList.add("active");
-    toast("⏺ Recording started (saved on this device when you stop)", "ok");
+    toast("⏺ Recording started — " + ((recorder.mimeType || mime || "webm").includes("mp4") ? "MP4" : "WebM") + " on this device when you stop", "ok", 5000);
   } catch (e) { toast("Recording not supported on this browser: " + e.message, "err"); }
 }
 function stopRecording() {
@@ -1841,7 +1860,7 @@ function stopRecording() {
   try { if (recStream) recStream.getVideoTracks().forEach((t) => t.stop()); } catch {}
   if (recRaf) { cancelAnimationFrame(recRaf); recRaf = null; }   /* v6 */
   $("#btnRec").classList.remove("active");
-  toast("🎬 Recording saved with YOUR brand — ready for your channel", "ok", 5000);
+  toast("🎬 Recording saved with YOUR brand. If your browser supports MP4 it saved .mp4; otherwise .webm.", "ok", 6000);
 }
 
 /* v4: teacher self-view — draggable anywhere + tap to cycle size
@@ -1926,7 +1945,7 @@ if (Store.get("wasLive", false) && !meetModeCheck()) {
       '<button id="resumeYes" class="btn small ok">▶ Resume class now</button>' +
       '<button id="resumeNo" class="btn small">Dismiss</button>';
     document.body.appendChild(bar);
-    $("#resumeYes").addEventListener("click", () => { bar.remove(); goLive(); });
+    $("#resumeYes").addEventListener("click", () => { Store.set("resume_autoadmit", true); bar.remove(); goLive(); });
     $("#resumeNo").addEventListener("click", () => { Store.set("wasLive", false); bar.remove(); });
   }, 800);
 }
@@ -2400,15 +2419,15 @@ onRoomEvent = function (type, p) {
    e/π, Ans, memory M+/M-/MR/MC, DEG/RAD toggle, history tape.
    ------------------------------------------------------------ */
 const CALC_KEYS = [
-  "2nd", "DEG", "MC", "MR", "M+", "M−",
-  "sin", "cos", "tan", "π", "e", "⌫",
-  "ln", "log", "√", "xʸ", "x²", "C",
-  "7", "8", "9", "(", ")", "÷",
-  "4", "5", "6", "n!", "%", "×",
-  "1", "2", "3", "1/x", "Ans", "−",
-  "0", ".", "±", "EXP", "=", "+"
+  "2nd", "MC", "MR", "M+", "M−", "C", "⌫",
+  "sin", "cos", "tan", "ln", "log", "√", "xʸ",
+  "π", "e", "(", ")", "n!", "%", "÷",
+  "7", "8", "9", "x²", "1/x", "EXP", "×",
+  "4", "5", "6", "abs", "Ans", "mod", "−",
+  "1", "2", "3", "±", ",", "=", "+",
+  "0", "."
 ];
-const CALC_2ND = { sin: "sin⁻¹", cos: "cos⁻¹", tan: "tan⁻¹", ln: "eˣ", log: "10ˣ", "√": "∛", "x²": "x³" };
+const CALC_2ND = { sin: "sin⁻¹", cos: "cos⁻¹", tan: "tan⁻¹", ln: "eˣ", log: "10ˣ", "√": "∛", "x²": "x³", abs: "round" };
 let calcExpr = "", calcAns = 0, calcMem = 0, calcDeg = true, calc2nd = false;
 
 (function buildCalc() {
@@ -2419,7 +2438,7 @@ let calcExpr = "", calcAns = 0, calcMem = 0, calcDeg = true, calc2nd = false;
     const b = document.createElement("button");
     b.textContent = k;
     b.dataset.k = k;
-    if (["sin","cos","tan","ln","log","√","xʸ","x²","n!","1/x","π","e","EXP","±","%","÷","×","−","+","(",")","Ans"].includes(k)) b.className = "op";
+    if (["sin","cos","tan","ln","log","√","xʸ","x²","n!","1/x","π","e","EXP","±","%","÷","×","−","+","(",")","Ans","abs","round","mod",","].includes(k)) b.className = "op";
     if (k === "=") b.className = "eq";
     if (["2nd","MC","MR","M+","M−","C","⌫"].includes(k)) b.className = "mem";
     b.addEventListener("click", () => calcPress(k, b));
@@ -2449,6 +2468,7 @@ function calcEval(expr) {
     .replace(/@ASIN\(/g, Dinv + "Math.asin(").replace(/@ACOS\(/g, Dinv + "Math.acos(").replace(/@ATAN\(/g, Dinv + "Math.atan(")
     .replace(/eˣ\(/g, "Math.exp(").replace(/10ˣ\(/g, "Math.pow(10,")
     .replace(/ln\(/g, "Math.log(").replace(/log\(/g, "Math.log10(")
+    .replace(/abs\(/g, "Math.abs(").replace(/round\(/g, "Math.round(")
     .replace(/∛\(/g, "Math.cbrt(").replace(/∛(\d+(\.\d+)?)/g, "Math.cbrt($1)")
     .replace(/√\(/g, "Math.sqrt(").replace(/√(\d+(\.\d+)?)/g, "Math.sqrt($1)")
     .replace(/(\d+(\.\d+)?|\))³/g, "Math.pow($1,3)")
@@ -2456,7 +2476,9 @@ function calcEval(expr) {
     .replace(/(\d+(\.\d+)?|\))!/g, "FACT($1)")
     .replace(/\^/g, "**")
     .replace(/(\d+(\.\d+)?)E(\+?-?\d+)/g, "($1*Math.pow(10,$3))")
-    .replace(/%/g, "/100");
+    .replace(/mod/g, "@MOD@")
+    .replace(/%/g, "/100")
+    .replace(/@MOD@/g, "%");
   if (!/^[\d+\-*/().,\s a-zA-Z*@!]*$/.test(e)) throw new Error("bad");
   // eslint-disable-next-line no-new-func
   const val = Function("FACT", '"use strict";return (' + e + ")")(calcFact);
@@ -2498,9 +2520,9 @@ function calcPress(k, btn) {
     case "n!": calcExpr += "!"; break;
     case "1/x": calcExpr = "1/(" + (calcExpr || calcAns) + ")"; break;
     case "EXP": calcExpr += "E"; break;
-    case "sin": case "cos": case "tan": case "ln": case "log":
+    case "sin": case "cos": case "tan": case "ln": case "log": case "abs":
       calcExpr += (calc2nd ? CALC_2ND[k] : k) + "("; break;
-    case "sin⁻¹": case "cos⁻¹": case "tan⁻¹": case "eˣ": case "10ˣ":
+    case "sin⁻¹": case "cos⁻¹": case "tan⁻¹": case "eˣ": case "10ˣ": case "round":
       calcExpr += k + "("; break;
     case "√": calcExpr += (calc2nd ? "∛" : "√") + "("; break;
     case "∛": calcExpr += "∛("; break;
