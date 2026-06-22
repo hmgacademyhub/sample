@@ -5,7 +5,7 @@
    whiteboard/PDF/notes work fully offline).
    Bump CACHE_VERSION whenever you deploy changes.
    ============================================================ */
-const CACHE_VERSION = "hmg-classdeck-v11.0.0-classdesk-v3";
+const CACHE_VERSION = "hmg-classdeck-v11.1.0-classdesk-v3";
 
 const SHELL = [
   "./",

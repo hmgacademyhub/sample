@@ -20,6 +20,7 @@
     </a>
 
     <span id="liveBadge" class="badge hide">● LIVE</span>
+    <span id="pendingBadge" class="badge hide" title="Students waiting for admission"></span>
     <span id="timerChip" class="badge"><span>⏱</span><b id="timerVal">00:00</b></span>
 
     <div class="roominfo" id="roomInfo" title="Tap to copy student link">
@@ -584,6 +585,7 @@
       <select class="input" id="actKind">
         <option value="open">💬 Open question — students type, you see all answers</option>
         <option value="cloud">☁ Word cloud — one-word answers build a live cloud</option>
+        <option value="board">🧱 Collaborate board — sticky-note wall for ideas / examples / questions</option>
         <option value="exit">🎟 Exit ticket — rating + learned + still confusing</option>
       </select>
       <label style="margin-top:8px">Prompt</label>
@@ -695,7 +697,8 @@ Not sure</textarea>
     <div class="row"><input class="input" id="inviteLink" readonly /><button class="btn primary" id="copyLink">Copy</button></div>
     <div id="qrBox" style="background:#fff;padding:14px;border-radius:12px;width:fit-content;margin:12px auto"></div>
     <p style="text-align:center;font-size:14px">Room code: <code id="inviteCode" style="color:var(--accent);font-size:20px;font-weight:700"></code>
-      <span id="invitePin" style="display:block;font-size:13px;color:var(--text-dim)"></span></p>
+      <span id="invitePin" style="display:block;font-size:13px;color:var(--text-dim)"></span>
+      <span id="inviteWaitroom" style="display:block;font-size:13px"></span></p>
     <p style="font-size:12.5px;color:var(--text-dim)">🔑 To require a PIN: <b>⚙ Settings → Class PIN</b>. Students then type it on the join screen.</p>
   </div>
 </div>
@@ -837,7 +840,7 @@ Not sure</textarea>
       <input class="input" id="suEmail" type="email" placeholder="Email address" autocomplete="email" />
       <input class="input" id="suPhone" type="tel" placeholder="WhatsApp / phone number" autocomplete="tel" />
       <input class="input" id="suSchool" placeholder="School / organisation (optional)" />
-      <input class="input" id="suPw" type="password" placeholder="Password (min 6 characters)" autocomplete="new-password" />
+      <input class="input" id="suPw" type="password" placeholder="Password (min 8 characters)" autocomplete="new-password" />
       <input class="input" id="suPw2" type="password" placeholder="Confirm password" autocomplete="new-password" />
       <p class="auth-err" id="suStatus"></p>
       <button class="btn primary auth-cta" onclick="signupTeacher()">Start my free trial ➜</button>
@@ -904,6 +907,7 @@ Not sure</textarea>
     <div id="reportBody" style="font-size:14px;line-height:1.7"></div>
     <div class="row" style="margin-top:10px">
       <button class="btn primary" id="reportDownload">⬇ Download report (.txt)</button>
+      <button class="btn" id="reportWhatsApp">📲 WhatsApp summary</button>
     </div>
   </div>
 </div>
