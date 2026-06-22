@@ -17,12 +17,17 @@ const PEER_CONFIG = {
   // Public PeerJS cloud (free). Only brokers signalling; media is P2P.
   debug: 1,
   config: {
+    iceCandidatePoolSize: 4,
     iceServers: [
       { urls: "stun:stun.l.google.com:19302" },
       { urls: "stun:stun1.l.google.com:19302" },
-      // Free public TURN (openrelay) – improves connectivity on mobile data.
-      { urls: "turn:openrelay.metered.ca:80",  username: "openrelayproject", credential: "openrelayproject" },
-      { urls: "turn:openrelay.metered.ca:443", username: "openrelayproject", credential: "openrelayproject" }
+      { urls: "stun:stun2.l.google.com:19302" },
+      // Free public TURN (OpenRelay) – improves connectivity on restrictive Wi‑Fi / mobile data.
+      { urls: "turn:openrelay.metered.ca:80", username: "openrelayproject", credential: "openrelayproject" },
+      { urls: "turn:openrelay.metered.ca:80?transport=tcp", username: "openrelayproject", credential: "openrelayproject" },
+      { urls: "turn:openrelay.metered.ca:443", username: "openrelayproject", credential: "openrelayproject" },
+      { urls: "turn:openrelay.metered.ca:443?transport=tcp", username: "openrelayproject", credential: "openrelayproject" },
+      { urls: "turns:openrelay.metered.ca:443?transport=tcp", username: "openrelayproject", credential: "openrelayproject" }
     ]
   }
 };
@@ -494,6 +499,11 @@ class TeacherRoom {
 
   end() {
     this.broadcast({ t: "classEnded" });
+    for (const [, p] of this.pending) {
+      try { p.conn.send({ t: "classEnded" }); } catch {}
+      try { p.conn.close(); } catch {}
+    }
+    this.pending.clear();
     for (const c of this.stageCalls.values()) { try { c.close(); } catch {} }
     for (const c of this.camCalls.values()) { try { c.close(); } catch {} }
     this.stageCalls.clear(); this.camCalls.clear();
@@ -528,13 +538,19 @@ class StudentRoom {
       let settled = false;
       this.peer.on("open", () => {
         this.conn = this.peer.connect(RTC_PREFIX + this.code + "-host", {
-          reliable: true, metadata: { name: this.name, pin: this.pin, tok: this.tok, rejoin: Store.get("joined_" + this.code, false) }
+          reliable: true,
+          serialization: "json",
+          metadata: { name: this.name, pin: this.pin, tok: this.tok, rejoin: Store.get("joined_" + this.code, false) }
         });
         const failT = setTimeout(() => {
           if (!settled) { settled = true; reject(new Error("Could not reach the class. Check the room code and that the teacher is live.")); }
         }, 15000);
         this.conn.on("open", () => { clearTimeout(failT); if (!settled) { settled = true; resolve(); } });
         this.conn.on("data", (d) => this._onData(d));
+        this.conn.on("error", (err) => {
+          clearTimeout(failT);
+          if (!settled) { settled = true; reject(new Error((err && err.message) || "Could not connect to the teacher.")); }
+        });
         this.conn.on("close", () => { if (!this._closedByUs) this.onEvent("disconnected"); });
       });
       this.peer.on("error", (err) => {
@@ -642,6 +658,9 @@ class StudentRoom {
 
   leave() {
     this._closedByUs = true;
+    try { this.shareCamera(false); } catch {}
+    try { this.shareMic(false); } catch {}
+    try { this.shareScreen(false); } catch {}
     try { this.conn && this.conn.close(); } catch {}
     try { this.peer && this.peer.destroy(); } catch {}
   }

@@ -31,6 +31,16 @@ const HMG_SECURITY_CFG = window.HMG_SECURITY || {};
 const LICENSE_GATEWAY = String(HMG_SECURITY_CFG.licenseGateway || "").replace(/\/+$/, "");
 const LICENSE_MODE = HMG_SECURITY_CFG.licenseMode || "hybrid"; // hybrid | strict
 
+function timeoutSignal(ms) {
+  if (typeof AbortSignal !== "undefined" && AbortSignal.timeout) return AbortSignal.timeout(ms);
+  if (typeof AbortController !== "undefined") {
+    const c = new AbortController();
+    setTimeout(() => c.abort(), ms);
+    return c.signal;
+  }
+  return undefined;
+}
+
 async function sha256Hex(str) {
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
   return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
@@ -131,7 +141,8 @@ async function gatewayVerify(acc, lic, reason) {
         licenseKey: lic && lic.key ? lic.key : "", localCreated: acc.created || 0,
         version: (window.HMG_VERSION || "classdesk-v3")
       }),
-      cache: "no-store"
+      cache: "no-store",
+      signal: timeoutSignal(12000)
     });
     const out = await r.json().catch(() => ({}));
     if (!r.ok || !out.ok) return { ok: false, why: out.why || ("Gateway rejected access (" + r.status + ")") };
@@ -267,6 +278,14 @@ function _authPass(acc, badgeText) {
 
 function finishAuth() { requireTeacherAccess(); }
 
+function warnInsecureOfflineSecret() {
+  if (AUTH_SECRET === "CHANGE-ME-HMG-2026" && !LICENSE_GATEWAY) {
+    const foot = $(".auth-foot");
+    if (foot) foot.textContent = "Security warning: the default offline licensing secret is still enabled. Change js/auth.js or configure the Cloudflare Worker license gateway before production deployment.";
+  }
+}
+warnInsecureOfflineSecret();
+
 /* dismiss (only allowed while trial still valid) */
 function authSkip() { $("#authGate").classList.add("hide"); }
 
@@ -320,7 +339,7 @@ let _revoked = null;
 async function fetchRevocations() {
   if (_revoked) return _revoked;
   try {
-    const r = await fetch("revoked.json?t=" + Date.now(), { cache: "no-store", signal: AbortSignal.timeout(8000) });
+    const r = await fetch("revoked.json?t=" + Date.now(), { cache: "no-store", signal: timeoutSignal(8000) });
     if (r.ok) _revoked = await r.json();
   } catch { _revoked = Store.get("revoked_cache", { keys: [], blockedEmails: [] }); }
   if (_revoked) Store.set("revoked_cache", _revoked);

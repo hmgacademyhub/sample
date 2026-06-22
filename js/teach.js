@@ -1225,9 +1225,48 @@ const roomCode = (() => {
 })();
 $("#roomCodeLbl").textContent = roomCode;
 
+/* Join-issue hardening:
+   - waiting room is now OFF unless the teacher explicitly turned it on
+   - the current state is always shown in the UI so teachers do not accidentally leave students in the lobby */
+if (!Store.get("waitroom_pref_set", false) && Store.get("waitroom", null) === null) {
+  Store.set("waitroom", false);
+}
+function syncWaitingRoomUI(forceVal) {
+  const on = typeof forceVal === "boolean" ? forceVal : (room ? !!room.waitingRoom : !!Store.get("waitroom", false));
+  const btn = $("#btnWaiting");
+  if (btn) {
+    btn.classList.toggle("active", on);
+    btn.textContent = on ? "🚪 Waiting room ON" : "🚪 Waiting room OFF";
+    btn.title = on
+      ? "Students wait in the lobby until you admit them"
+      : "Students join directly when they open your link";
+  }
+  const hint = $("#inviteWaitroom");
+  if (hint) {
+    hint.textContent = on
+      ? "🚪 Waiting room is ON — open 👥 Students and tap Admit / Admit all when learners arrive."
+      : "✅ Waiting room is OFF — students join directly when they open the link.";
+    hint.style.color = on ? "var(--warn)" : "var(--ok)";
+  }
+}
+function refreshPendingBadge() {
+  const el = $("#pendingBadge");
+  if (!el) return;
+  const n = room ? room.pending.size : 0;
+  el.textContent = n ? ("🚪 " + n + " waiting") : "";
+  el.classList.toggle("hide", !n);
+}
+let liveInviteToken = "";
+function rotateInviteToken() {
+  liveInviteToken = randomCode(18);
+  Store.set("invite_token_" + roomCode, liveInviteToken);
+  return liveInviteToken;
+}
 function inviteToken() {
+  if (liveInviteToken) return liveInviteToken;
   let t = Store.get("invite_token_" + roomCode, "");
-  if (!t) { t = randomCode(16); Store.set("invite_token_" + roomCode, t); }
+  if (!t) t = rotateInviteToken();
+  liveInviteToken = t;
   return t;
 }
 function studentLink() {
@@ -1246,6 +1285,7 @@ $("#btnQR").addEventListener("click", () => {
   $("#inviteLiveWarn").style.display = (room && room.peer && !room.peer.destroyed) ? "none" : "block";
   const pin = Store.get("pin", "");
   $("#invitePin").textContent = pin ? "Class PIN: " + pin + " (students must type this)" : "No PIN set (anyone with the link can join)";
+  syncWaitingRoomUI();
   if (location.protocol === "file:") {
     toast("⚠ You are running from a local file — deploy to your https:// address first, or students cannot reach you.", "err", 8000);
   }
@@ -1260,6 +1300,8 @@ $("#copyLink").addEventListener("click", async () => {
 $("#roomInfo").addEventListener("click", async () => {
   try { await navigator.clipboard.writeText(studentLink()); toast("Student link copied!", "ok"); } catch {}
 });
+syncWaitingRoomUI();
+refreshPendingBadge();
 
 /* v5 (issue 6): multi-teacher support. Every browser/device generates its OWN
    room code, so any number of teachers can run classes simultaneously on the
@@ -1286,10 +1328,12 @@ async function goLive() {
     room = new TeacherRoom(roomCode, { onEvent: onRoomEvent });
     room.roomName = Store.get("roomname", "") || ("Class " + roomCode);
     room.pin = Store.get("pin", "");
-    room.inviteToken = Store.get("secure_invite", false) ? inviteToken() : "";
-    /* v6 (issue 1): teacher approval is the DEFAULT — students wait until admitted */
-    room.waitingRoom = Store.get("waitroom", true);
+    room.inviteToken = Store.get("secure_invite", false) ? rotateInviteToken() : "";
+    /* Join-issue fix: students now join directly by default unless the teacher explicitly enables the waiting room. */
+    room.waitingRoom = Store.get("waitroom", false);
     room.autoAdmitRejoin = Store.get("wasLive", false); // resume fix: previously admitted students bypass waiting room
+    syncWaitingRoomUI(room.waitingRoom);
+    refreshPendingBadge();
     /* v5 bug-fix: PIN applied atomically
                                                (was a setTimeout race in v4) */
     await room.start();
@@ -1335,8 +1379,14 @@ async function goLive() {
     Store.set("wasLive", true);   /* v5 (issue 3): remember we were live */
     room.autoAdmitRejoin = true;
     audit("go-live", "Class started");
-    toast("You are LIVE. Share the invite link with students.", "ok", 5000);
+    toast(room.waitingRoom
+      ? "You are LIVE. Waiting room is ON — new students will stay in the lobby until you admit them in 👥 Students."
+      : "You are LIVE. Students will join directly when you share the invite link.", "ok", 6000);
   } catch (e) {
+    try { room && room.end && room.end(); } catch {}
+    room = null;
+    refreshPendingBadge();
+    syncWaitingRoomUI();
     toast(e.message || "Could not start class", "err", 6000);
     $("#btnGoLive").disabled = false;
   }
@@ -1418,6 +1468,8 @@ function endLive() {
   $("#sigDot").className = "dot off";
   $("#stuCount").textContent = "0 👥";
   room = null;
+  refreshPendingBadge();
+  syncWaitingRoomUI();
   window._wantWake = false; keepAwake(false);
   audit("end-live", "Class ended");
   toast("Class ended. Attendance is available in the Students drawer until you reload.");
@@ -1468,6 +1520,7 @@ function onRoomEvent(type, p) {
       break;
   }
   $("#stuCount").textContent = (room ? room.students.size : 0) + " 👥";
+  refreshPendingBadge();
 }
 
 function renderRoster() {
@@ -2586,6 +2639,25 @@ $("#btnReport").addEventListener("click", () => {
 $("#reportDownload").addEventListener("click", () => {
   downloadBlob(new Blob([buildReport()], { type: "text/plain" }), "class-report-" + roomCode + "-" + Date.now() + ".txt");
 });
+function buildWhatsAppSummary() {
+  if (!room) return "No live class data yet.";
+  const s = room.stats;
+  const lb = room.leaderboard().slice(0, 5);
+  return [
+    "HMG ClassDeck class summary",
+    "Room: " + room.code,
+    room.roomName ? ("Class: " + room.roomName) : "",
+    "Duration: " + (s.start ? fmtTime((Date.now() - s.start) / 1000) : "—"),
+    "Total joins: " + s.joins,
+    "Peak attendance: " + s.peak,
+    lb.length ? ("Top scores: " + lb.map((r, i) => (i + 1) + ". " + r.name + " (" + r.score + " pts)").join("; ")) : "Top scores: none yet",
+    "Generated: " + nowStamp()
+  ].filter(Boolean).join("\n");
+}
+$("#reportWhatsApp").addEventListener("click", () => {
+  const msg = encodeURIComponent(buildWhatsAppSummary());
+  window.open("https://wa.me/?text=" + msg, "_blank", "noopener");
+});
 
 /* ------------------------------------------------------------
    v3.5 Room PIN + branding + backup/restore (Settings)
@@ -2671,14 +2743,15 @@ drawComposite = function () {
    v4: Zoom/Meet-style classroom controls
    (waiting room, mute-all, spotlight, emoji reactions)
    ------------------------------------------------------------ */
-$("#btnWaiting").addEventListener("click", (e) => {
+$("#btnWaiting").addEventListener("click", () => {
   if (!room) { toast("Go live first"); return; }
   room.setWaitingRoom(!room.waitingRoom);
   Store.set("waitroom", room.waitingRoom);
-  e.currentTarget.classList.toggle("active", room.waitingRoom);
+  Store.set("waitroom_pref_set", true);
+  syncWaitingRoomUI(room.waitingRoom);
   toast(room.waitingRoom
-    ? "🚪 Waiting room ON — you must admit each student"
-    : "Waiting room off — students join directly");
+    ? "🚪 Waiting room ON — new students will stay in the lobby until you admit them."
+    : "✅ Waiting room OFF — students will join directly.");
 });
 $("#btnMuteAll").addEventListener("click", () => {
   if (!room) return;
@@ -2689,7 +2762,13 @@ $("#btnMuteAll").addEventListener("click", () => {
 
 function renderWaiting() {
   const list = $("#waitingList");
-  if (!room || room.pending.size === 0) { list.innerHTML = ""; return; }
+  if (!room || room.pending.size === 0) {
+    list.innerHTML = room && room.waitingRoom
+      ? '<p style="color:var(--text-dim);font-size:12.5px">Waiting room is on. New students will appear here for admission.</p>'
+      : "";
+    refreshPendingBadge();
+    return;
+  }
   list.innerHTML = '<b style="font-size:13px">🚪 Waiting to be admitted</b>';
   for (const [pid, p] of room.pending) {
     const row = document.createElement("div");
@@ -2698,15 +2777,16 @@ function renderWaiting() {
     row.innerHTML = `<span class="name">${escapeHtml(p.name)}</span>
       <button class="btn small ok" data-a="adm">✔ Admit</button>
       <button class="btn small danger" data-a="deny">✕</button>`;
-    row.querySelector('[data-a="adm"]').addEventListener("click", () => { room.admit(pid); renderWaiting(); });
+    row.querySelector('[data-a="adm"]').addEventListener("click", () => { room.admit(pid); renderWaiting(); renderRoster(); });
     row.querySelector('[data-a="deny"]').addEventListener("click", () => { room.deny(pid); renderWaiting(); });
     list.appendChild(row);
   }
   const all = document.createElement("button");
   all.className = "btn small primary";
   all.textContent = "✔ Admit all";
-  all.addEventListener("click", () => { room.admitAll(); renderWaiting(); });
+  all.addEventListener("click", () => { room.admitAll(); renderWaiting(); renderRoster(); });
   list.appendChild(all);
+  refreshPendingBadge();
 }
 
 /* floating emoji reactions (teacher sees student reactions fly up) */
@@ -2724,7 +2804,12 @@ function flyEmoji(emoji, name) {
 const _v3OnRoomEvent = onRoomEvent;
 onRoomEvent = function (type, p) {
   _v3OnRoomEvent(type, p);
-  if (type === "waiting") { renderWaiting(); toast("🚪 " + p.name + " is waiting — open 👥 to admit", "", 6000); }
+  if (type === "waiting") {
+    renderWaiting();
+    refreshPendingBadge();
+    if (!$("#drawerStudents").classList.contains("open")) toggleDrawer("#drawerStudents");
+    toast("🚪 " + p.name + " is waiting — admit them in the Students panel.", "", 7000);
+  }
   if (type === "reaction") flyEmoji(p.emoji, p.name);
   if (type === "student-joined" || type === "student-left") renderWaiting();
 };
@@ -3331,7 +3416,7 @@ $("#actStart").addEventListener("click", () => {
   room.startActivity({ kind, prompt });
   $("#actSetup").classList.add("hide");
   $("#actLive").classList.remove("hide");
-  $("#actLiveTitle").textContent = ({ open: "💬 ", cloud: "☁ ", exit: "🎟 " })[kind] + prompt;
+  $("#actLiveTitle").textContent = ({ open: "💬 ", cloud: "☁ ", board: "🧱 ", exit: "🎟 " })[kind] + prompt;
   $("#actResponses").innerHTML = "";
   $("#actCount").textContent = "0";
   toast("🧩 Activity sent to all students", "ok");
@@ -3350,13 +3435,22 @@ $("#actEndQuiet").addEventListener("click", () => endActivity(false));
 function renderActivityResp(p) {
   $("#actCount").textContent = p.count;
   const div = document.createElement("div");
-  div.className = "chat-msg";
+  const liveKind = room && room.activity && room.activity.def ? room.activity.def.kind : "open";
   if (typeof p.resp === "object" && p.resp && p.resp.rating !== undefined) {
+    div.className = "chat-msg";
     div.innerHTML = '<div class="who">' + escapeHtml(p.name) + "</div>" +
       "⭐".repeat(Math.max(1, Math.min(5, p.resp.rating))) +
       "<br/><b>Learned:</b> " + escapeHtml(p.resp.learned || "—") +
       "<br/><b>Confusing:</b> " + escapeHtml(p.resp.confusing || "—");
+  } else if (liveKind === "board") {
+    div.className = "chat-msg";
+    div.style.background = ["#fff9c4", "#dbeafe", "#dcfce7", "#fde2e7", "#ede9fe"][p.count % 5];
+    div.style.color = "#152238";
+    div.style.borderLeft = "4px solid var(--accent)";
+    div.style.transform = "rotate(" + (((p.count % 5) - 2) * 1.2) + "deg)";
+    div.innerHTML = '<div class="who" style="color:#152238">' + escapeHtml(p.name) + "</div>" + escapeHtml(String(p.resp));
   } else {
+    div.className = "chat-msg";
     div.innerHTML = '<div class="who">' + escapeHtml(p.name) + "</div>" + escapeHtml(String(p.resp));
   }
   $("#actResponses").prepend(div);

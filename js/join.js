@@ -9,6 +9,7 @@
 let sRoom = null;
 let handUp = false;
 let myCamOn = false, myMicOn = false, micAllowed = false;
+let stageEntered = false;
 
 const qs = new URLSearchParams(location.search);
 if (qs.get("room")) {
@@ -23,6 +24,44 @@ if (qs.get("room")) {
 }
 $("#inName").value = Store.get("stuname", "");
 setTimeout(() => { try { $("#inName").focus(); } catch {} }, 300);
+
+function browserLabel() {
+  const ua = navigator.userAgent || "";
+  if (/Edg\//.test(ua)) return "Microsoft Edge";
+  if (/Chrome\//.test(ua) && !/Edg\//.test(ua)) return "Google Chrome";
+  if (/Firefox\//.test(ua)) return "Firefox";
+  if (/Safari\//.test(ua) && !/Chrome\//.test(ua)) return "Safari";
+  return "Browser";
+}
+function inAppBrowserName() {
+  const ua = (navigator.userAgent || "").toLowerCase();
+  if (ua.includes("wv")) return "Android in-app browser/WebView";
+  if (ua.includes("instagram")) return "Instagram in-app browser";
+  if (ua.includes("fbav") || ua.includes("fban")) return "Facebook in-app browser";
+  if (ua.includes("tiktok")) return "TikTok in-app browser";
+  if (ua.includes("telegram")) return "Telegram in-app browser";
+  return "";
+}
+function updateJoinDiagnostics() {
+  const box = $("#joinDiag");
+  if (!box) return;
+  const issues = [];
+  const good = [];
+  good.push((location.protocol === "https:" ? "✅" : "⚠️") + " Site: " + location.protocol.replace(":", "").toUpperCase());
+  good.push((window.RTCPeerConnection ? "✅" : "❌") + " WebRTC: " + (window.RTCPeerConnection ? "supported" : "not supported"));
+  good.push((window.Peer ? "✅" : "❌") + " Join engine: " + (window.Peer ? "loaded" : "missing"));
+  good.push("ℹ️ Browser: " + browserLabel());
+  const inApp = inAppBrowserName();
+  if (inApp) issues.push("Open this link in Chrome, Edge or Safari — it is currently inside " + inApp + ", which often blocks classroom joining.");
+  if (location.protocol !== "https:" && location.hostname !== "localhost") issues.push("Use the deployed HTTPS website. Camera, microphone and WebRTC are unreliable on non-HTTPS pages.");
+  if (!window.RTCPeerConnection) issues.push("This browser does not support WebRTC classrooms. Try Chrome, Edge or Safari.");
+  if (!navigator.onLine) issues.push("This device appears offline right now.");
+  box.innerHTML = "<b>Quick device check</b><br/>" +
+    good.map((x) => "<div>" + escapeHtml(x) + "</div>").join("") +
+    (issues.length ? '<div style="margin-top:6px;color:var(--warn)"><b>Fix if joining fails:</b><br/>' + issues.map((x) => "• " + escapeHtml(x)).join("<br/>") + "</div>" : '<div style="margin-top:6px;color:var(--ok)">This device looks ready to join.</div>');
+}
+updateJoinDiagnostics();
+["#inRoom", "#inName", "#inPin"].forEach((sel) => $(sel) && $(sel).addEventListener("input", updateJoinDiagnostics));
 
 /* ---------- join flow ---------- */
 $("#btnJoin").addEventListener("click", () => { lobbyOn ? stopLobby() : join(); });
@@ -41,7 +80,7 @@ async function join() {
   sRoom = new StudentRoom(code, name, { onEvent: onEvent, pin: $("#inPin").value.trim(), tok: qs.get("tok") || "" });
   try {
     await sRoom.join();
-    enterStage();
+    $("#joinStatus").textContent = "Connected — waiting for the teacher…";
   } catch (e) {
     /* v5 (issue 2): LOBBY — if the class is not live yet, wait politely and
        keep retrying until the teacher goes live. No more "join failed". */
@@ -89,6 +128,8 @@ function restoreJoinButton() {
 }
 
 function enterStage() {
+  if (stageEntered) return;
+  stageEntered = true;
   $("#joinGate").classList.add("hide");
   $("#stageWrap").classList.remove("hide");
   $("#stageStatus").classList.remove("hide");
@@ -107,16 +148,16 @@ function onEvent(type, p) {
     case "welcome":
       Store.set("joined_" + (sRoom ? sRoom.code : $("#inRoom").value.trim().toUpperCase()), true);
       closeModal("#mWaiting");
-      if ($("#joinGate")) $("#joinGate").classList.add("hide");
+      enterStage();
       $("#roomNameChip").textContent = p.roomName || "";
       $("#countChip").textContent = "👥 " + (p.count || 1);
-      toast("Joined! Waiting for the teacher's screen…", "ok");
+      toast(p.rejoined ? "Reconnected — waiting for the teacher's screen…" : "Joined! Waiting for the teacher's screen…", "ok");
       break;
     case "roster":
       $("#countChip").textContent = "👥 " + (p.count || 0);
       break;
     case "media":
-      if (p.kind === "stage") attachStage(p.stream);
+      if (p.kind === "stage") { enterStage(); attachStage(p.stream); }
       else if (p.kind === "teachercam") attachTeacherCam(p.stream);
       break;
     case "media-end":
@@ -124,6 +165,9 @@ function onEvent(type, p) {
       break;
     case "chat":
       addMsg(p.from, p.text, p.from === Store.get("stuname", ""));
+      break;
+    case "caption":
+      showCaption(p);
       break;
     case "announce":
       $("#announceText").textContent = p.text;
@@ -493,6 +537,8 @@ async function attemptRejoin() {
 
 function cleanupAndGate(message) {
   try { sRoom && sRoom.leave(); } catch {}
+  stageEntered = false;
+  pendingStream = null;
   $("#stageWrap").classList.add("hide");
   $("#stageStatus").classList.add("hide");
   $("#stuControls").classList.add("hidden");
@@ -599,12 +645,12 @@ function sbQueueSend(full) {
 let actKind = null, actRating = 0;
 function showActivity(def) {
   actKind = def.kind;
-  $("#sActTitle").textContent = ({ open: "💬 ", cloud: "☁ ", exit: "🎟 " })[def.kind] + def.prompt;
+  $("#sActTitle").textContent = ({ open: "💬 ", cloud: "☁ ", board: "🧱 ", exit: "🎟 " })[def.kind] + def.prompt;
   $("#sActOpen").classList.toggle("hide", def.kind === "exit");
   $("#sActExit").classList.toggle("hide", def.kind !== "exit");
   $("#sActText").value = "";
-  $("#sActText").placeholder = def.kind === "cloud" ? "One word only…" : "Type your answer…";
-  $("#sActText").maxLength = def.kind === "cloud" ? 24 : 280;
+  $("#sActText").placeholder = def.kind === "cloud" ? "One word only…" : def.kind === "board" ? "Write one sticky-note idea…" : "Type your answer…";
+  $("#sActText").maxLength = def.kind === "cloud" ? 24 : def.kind === "board" ? 120 : 280;
   $("#sActDone").classList.add("hide");
   $("#sActSend").classList.remove("hide");
   actRating = 0;
@@ -631,7 +677,7 @@ $("#sActSend").addEventListener("click", () => {
 });
 
 function showActivityResults(d) {
-  $("#sResTitle").textContent = (d.kind === "cloud" ? "☁ " : "💬 ") + d.prompt;
+  $("#sResTitle").textContent = ({ cloud: "☁ ", board: "🧱 ", open: "💬 ", exit: "🎟 " })[d.kind] + d.prompt;
   const body = $("#sResBody");
   if (d.kind === "cloud") {
     /* build a word cloud: count words, size by frequency */
@@ -647,6 +693,10 @@ function showActivityResults(d) {
       '<span style="font-size:' + (15 + (n / max) * 26) + 'px;color:' + colors[i % 6] +
       ';font-weight:700;margin:0 8px;display:inline-block">' + escapeHtml(w) + "</span>").join(" ");
     body.style.textAlign = "center";
+  } else if (d.kind === "board") {
+    const colors = ["#fff9c4", "#dbeafe", "#dcfce7", "#fde2e7", "#ede9fe"];
+    body.style.textAlign = "left";
+    body.innerHTML = d.items.map((t, i) => '<div class="chat-msg" style="display:inline-block;vertical-align:top;min-width:150px;max-width:220px;margin:8px;padding:12px;background:' + colors[i % colors.length] + ';color:#152238;border-left:4px solid var(--accent);transform:rotate(' + (((i % 5) - 2) * 1.5) + 'deg)">' + escapeHtml(String(t)) + '</div>').join("");
   } else {
     body.style.textAlign = "left";
     body.innerHTML = d.items.map((t) => '<div class="chat-msg">' + escapeHtml(String(t)) + "</div>").join("");
